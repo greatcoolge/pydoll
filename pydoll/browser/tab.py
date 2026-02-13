@@ -1406,7 +1406,7 @@ class Tab(FindElementsMixin):
         if _before_page_events_enabled is False:
             await self.disable_page_events()
 
-    @@asynccontextmanager
+    @asynccontextmanager
 async def expect_and_bypass_cloudflare_captcha(
     self,
     time_to_wait_captcha: int = 60,
