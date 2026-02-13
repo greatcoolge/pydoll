@@ -264,7 +264,7 @@ async def test_get_window_id_for_tab_uses_ws_target_when_no_target_id(mock_brows
     window_id = await mock_browser.get_window_id_for_tab(tab)
     assert window_id == 'win1'
     mock_browser._connection_handler.execute_command.assert_called_with(
-        BrowserCommands.get_window_for_target('targetXYZ'), timeout=10
+        BrowserCommands.get_window_for_target('targetXYZ'), timeout=30
     )
 
 
