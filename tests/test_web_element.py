@@ -352,7 +352,7 @@ class TestWebElementIFrame:
     async def test_iframe_context_initialization(self, iframe_element):
         """Iframe context should be created via CDP commands."""
 
-        async def side_effect(command, timeout=10):
+        async def side_effect(command, timeout=30):
             method = command['method']
             if method == 'DOM.describeNode':
                 return {
@@ -398,7 +398,7 @@ class TestWebElementIFrame:
     @pytest.mark.asyncio
     async def test_iframe_inner_html_uses_runtime_evaluate(self, iframe_element):
         """inner_html should read from iframe execution context."""
-        async def side_effect(command, timeout=10):
+        async def side_effect(command, timeout=30):
             method = command['method']
             if method == 'DOM.describeNode':
                 return {
@@ -455,7 +455,7 @@ class TestWebElementIFrame:
     async def test_find_within_iframe_uses_document_context(self, iframe_element):
         """find() should query against the iframe's document element."""
 
-        async def side_effect(command, timeout=10):
+        async def side_effect(command, timeout=30):
             method = command['method']
             if method == 'DOM.describeNode':
                 object_id = command['params'].get('objectId')
@@ -1214,7 +1214,7 @@ class TestWebElementUtilityMethods:
             return_by_value=True,
         )
         web_element._connection_handler.execute_command.assert_called_once_with(
-            expected_command, timeout=10
+            expected_command, timeout=30
         )
 
 class TestBuildTextExpression:
@@ -1283,7 +1283,7 @@ class TestIsOptionElementHeuristics:
             function_declaration='function(){ this.style.border = "2px solid red" }',
         )
         web_element._connection_handler.execute_command.assert_called_once_with(
-            expected_command, timeout=10
+            expected_command, timeout=30
         )
 
     @pytest.mark.asyncio
@@ -1301,7 +1301,7 @@ class TestIsOptionElementHeuristics:
             function_declaration='function() { this.style.border = "2px solid red"; }',
         )
         web_element._connection_handler.execute_command.assert_called_once_with(
-            expected_command, timeout=10
+            expected_command, timeout=30
         )
 
     @pytest.mark.asyncio
@@ -1325,7 +1325,7 @@ class TestIsOptionElementHeuristics:
             user_gesture=True,
         )
         web_element._connection_handler.execute_command.assert_called_once_with(
-            expected_command, timeout=10
+            expected_command, timeout=30
         )
 
     @pytest.mark.asyncio
@@ -1343,7 +1343,7 @@ class TestIsOptionElementHeuristics:
             function_declaration='() => { this.style.color = "red"; }',
         )
         web_element._connection_handler.execute_command.assert_called_once_with(
-            expected_command, timeout=10
+            expected_command, timeout=30
         )
 
     @pytest.mark.asyncio
@@ -1389,7 +1389,7 @@ class TestIsOptionElementHeuristics:
             arguments=arguments,
         )
         web_element._connection_handler.execute_command.assert_called_once_with(
-            expected_command, timeout=10
+            expected_command, timeout=30
         )
 
     @pytest.mark.asyncio
@@ -1427,7 +1427,7 @@ class TestIsOptionElementHeuristics:
             unique_context_id="unique_123",
         )
         web_element._connection_handler.execute_command.assert_called_once_with(
-            expected_command, timeout=10
+            expected_command, timeout=30
         )
 
     def test_repr(self, web_element):
@@ -1646,7 +1646,7 @@ class TestWebElementEdgeCases:
             files=[], object_id='file-input-object-id'
         )
         file_input_element._connection_handler.execute_command.assert_called_once_with(
-            expected_command, timeout=10
+            expected_command, timeout=30
         )
 
 
@@ -2030,7 +2030,7 @@ class TestInnerHtmlEdgeCases:
     async def test_inner_html_iframe_element_with_context(self, iframe_element):
         """Test inner_html on iframe element uses Runtime.evaluate in iframe context."""
 
-        async def side_effect(command, timeout=10):
+        async def side_effect(command, timeout=30):
             method = command['method']
             if method == 'DOM.describeNode':
                 return {
