@@ -1435,7 +1435,7 @@ class Tab(FindElementsMixin):
         _before_page_events_enabled = self.page_events_enabled
         if not _before_page_events_enabled:
             await self.enable_page_events()
-    
+
         captcha_processed = asyncio.Event()
         load_event_received = asyncio.Event()
         callback_id = None
