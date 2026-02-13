@@ -1409,9 +1409,11 @@ class Tab(FindElementsMixin):
     @asynccontextmanager
     async def expect_and_bypass_cloudflare_captcha(
         self,
-        custom_selector: Optional[tuple[By, str]] = None,
+        custom_selector: Optional[tuple] = None,
         time_before_click: Optional[float] = None,
         time_to_wait_captcha: float = 5,
+        wait_for_load: Optional[bool] = None,
+        load_timeout: int = 3,
     ) -> AsyncGenerator[None, None]:
         """
         Context manager for automatic Cloudflare captcha bypass.
@@ -1422,7 +1424,10 @@ class Tab(FindElementsMixin):
             time_before_click: Deprecated — ignored. The checkbox is now
                 located via shadow root polling and clicked immediately.
             time_to_wait_captcha: Timeout for captcha detection (default 5s).
+            wait_for_load: If True, wait for LOAD_EVENT_FIRED before bypass.
+            load_timeout: Timeout waiting for LOAD_EVENT_FIRED.
         """
+
         if custom_selector is not None:
             warnings.warn(
                 'custom_selector is deprecated and ignored. Cloudflare Turnstile is now '
@@ -1440,29 +1445,52 @@ class Tab(FindElementsMixin):
             )
 
         captcha_processed = asyncio.Event()
-
-        async def bypass_cloudflare(_: dict):
-            try:
-                await self._bypass_cloudflare(
-                    _,
-                    time_to_wait_captcha=time_to_wait_captcha,
-                )
-            finally:
-                captcha_processed.set()
+        load_event_received = asyncio.Event()
+        callback_id = None
 
         _before_page_events_enabled = self.page_events_enabled
-
         if not _before_page_events_enabled:
             await self.enable_page_events()
 
         logger.info('Expecting and bypassing Cloudflare captcha if present')
-        callback_id = await self.on(PageEvent.LOAD_EVENT_FIRED, bypass_cloudflare)
+
+        async def bypass_cloudflare(event: dict):
+            try:
+                await self._bypass_cloudflare(event, time_to_wait_captcha=time_to_wait_captcha)
+            finally:
+                captcha_processed.set()
+
+        async def on_load_event(event: dict):
+            load_event_received.set()
+            await bypass_cloudflare(event)
+
+        # 决定是否等待 LOAD_EVENT_FIRED
+        should_wait_load = wait_for_load
+        if should_wait_load is None:
+            # 尝试先绑定回调并等待
+            callback_id = await self.on(PageEvent.LOAD_EVENT_FIRED, on_load_event)
+            try:
+                await asyncio.wait_for(load_event_received.wait(), timeout=load_timeout)
+                should_wait_load = True
+                logger.debug("Load event detected, using load-based mode")
+            except asyncio.TimeoutError:
+                should_wait_load = False
+                logger.debug("No load event detected, using direct bypass mode")
+        elif should_wait_load:
+            callback_id = await self.on(PageEvent.LOAD_EVENT_FIRED, bypass_cloudflare)
 
         try:
+            # yield 先给调用者
             yield
-            await captcha_processed.wait()
+            # 等待 captcha 处理完成
+            if should_wait_load:
+                await captcha_processed.wait()
+            else:
+                # 直接 bypass
+                await bypass_cloudflare({})
         finally:
-            await self._connection_handler.remove_callback(callback_id)
+            if callback_id:
+                await self._connection_handler.remove_callback(callback_id)
             if not _before_page_events_enabled:
                 await self.disable_page_events()
 
