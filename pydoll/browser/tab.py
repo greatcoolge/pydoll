@@ -1472,10 +1472,10 @@ class Tab(FindElementsMixin):
                 await captcha_processed.wait()  
             else:  
                 await bypass_cloudflare({})  
-        finally:  
-            if callback_id:  
-                await self._connection_handler.remove_callback(callback_id)  
-            if not _before_page_events_enabled:  
+        finally:
+            if callback_id:
+                await self._connection_handler.remove_callback(callback_id)
+            if not _before_page_events_enabled:
                 await self.disable_page_events()
 
     @asynccontextmanager
