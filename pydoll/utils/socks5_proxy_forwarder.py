@@ -541,7 +541,7 @@ async def _test_negotiate_auth(
     await writer.drain()
     logger.info('-> Greeting:  %s', greeting.hex())
 
-    resp = await asyncio.wait_for(reader.readexactly(2), timeout=10)
+    resp = await asyncio.wait_for(reader.readexactly(2), timeout=30)
     logger.info('<- Method:    %s  (selected method: %#04x)', resp.hex(), resp[1])
 
     if resp[0] != SOCKS5_VERSION:
@@ -556,7 +556,7 @@ async def _test_negotiate_auth(
         await writer.drain()
         logger.info('-> Auth:      ulen=%d plen=%d', len(uname), len(passwd))
 
-        auth_resp = await asyncio.wait_for(reader.readexactly(2), timeout=10)
+        auth_resp = await asyncio.wait_for(reader.readexactly(2), timeout=30)
         logger.info('<- Auth resp: %s  (status: %#04x)', auth_resp.hex(), auth_resp[1])
         if auth_resp[1] != 0x00:
             logger.error('Authentication rejected')
