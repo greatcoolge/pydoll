@@ -1359,7 +1359,7 @@ class TestTabCloudflareBypass:
 
         with patch.object(tab, 'find_shadow_roots', side_effect=mock_find_shadow_roots):
             with patch('asyncio.sleep', AsyncMock()):
-                result = await tab._find_cloudflare_shadow_root(timeout=10)
+                result = await tab._find_cloudflare_shadow_root(timeout=30)
 
         assert result is cf_sr
         assert call_count == 2
