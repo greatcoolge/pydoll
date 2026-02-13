@@ -1410,17 +1410,28 @@ class Tab(FindElementsMixin):
     async def expect_and_bypass_cloudflare_captcha(  
         self,  
         time_to_wait_captcha: int = 60,  
-        time_before_click: int = 2,  
+        time_before_click: Optional[int] = 2,  # 改为 Optional 以匹配原签名  
         custom_selector: Optional[tuple] = None,  
         wait_for_load: Optional[bool] = None,  
         load_timeout: int = 3,  
     ):  
-        if time_before_click != 2:  # 或根据测试需求无条件警告  
+        # 恢复原警告逻辑：非 None 时警告  
+        if time_before_click is not None:  
             warnings.warn(  
-                'time_before_click is deprecated',  
+                'time_before_click is deprecated and ignored. The checkbox is now '  
+                'located via shadow root polling and clicked immediately.',  
                 DeprecationWarning,  
                 stacklevel=2,  
             )  
+        # 若需兼容 custom_selector 弃用，可加：  
+        if custom_selector is not None:  
+            warnings.warn(  
+                'custom_selector is deprecated and ignored. Cloudflare Turnstile is now '  
+                'detected automatically via shadow root inspection.',  
+                DeprecationWarning,  
+                stacklevel=2,  
+            )  
+  
         logger.info('Expecting and bypassing Cloudflare captcha if present')  
         _before_page_events_enabled = self.page_events_enabled  
         if not _before_page_events_enabled:  
