@@ -1445,8 +1445,6 @@ class Tab(FindElementsMixin):
             try:  
                 await self._bypass_cloudflare(  
                     event,  
-                    custom_selector=custom_selector,  
-                    time_before_click=time_before_click,  
                     time_to_wait_captcha=time_to_wait_captcha,  
                 )  
             finally:  
