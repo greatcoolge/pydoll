@@ -733,7 +733,7 @@ class FindElementsMixin:
         handler, session_id = self._resolve_routing()
         if session_id:
             command['sessionId'] = session_id
-        return await handler.execute_command(command, timeout=10)
+        return await handler.execute_command(command, timeout=30)
 
     def _get_find_element_command(
         self,
