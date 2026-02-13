@@ -601,6 +601,14 @@
         <xhtml:link rel="alternate" hreflang="zh" href="https://pydoll.tech/docs/zh/features/automation/keyboard-control/"/>
     </url>
     <url>
+        <loc>https://pydoll.tech/docs/features/automation/mouse-control/</loc>
+        <lastmod>2026-02-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://pydoll.tech/docs/features/automation/mouse-control/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://pydoll.tech/docs/pt/features/automation/mouse-control/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://pydoll.tech/docs/zh/features/automation/mouse-control/"/>
+    </url>
+    <url>
         <loc>https://pydoll.tech/docs/features/automation/screenshots-and-pdfs/</loc>
         <lastmod>2026-02-13</lastmod>
         <changefreq>daily</changefreq>
@@ -1281,6 +1289,14 @@
         <xhtml:link rel="alternate" hreflang="pt" href="https://pydoll.tech/docs/pt/features/automation/keyboard-control/"/>
     </url>
     <url>
+        <loc>https://pydoll.tech/docs/zh/features/automation/mouse-control/</loc>
+        <lastmod>2026-02-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://pydoll.tech/docs/zh/features/automation/mouse-control/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://pydoll.tech/docs/features/automation/mouse-control/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://pydoll.tech/docs/pt/features/automation/mouse-control/"/>
+    </url>
+    <url>
         <loc>https://pydoll.tech/docs/zh/features/automation/screenshots-and-pdfs/</loc>
         <lastmod>2026-02-13</lastmod>
         <changefreq>daily</changefreq>
@@ -1959,6 +1975,14 @@
         <xhtml:link rel="alternate" hreflang="pt" href="https://pydoll.tech/docs/pt/features/automation/keyboard-control/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://pydoll.tech/docs/features/automation/keyboard-control/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://pydoll.tech/docs/zh/features/automation/keyboard-control/"/>
+    </url>
+    <url>
+        <loc>https://pydoll.tech/docs/pt/features/automation/mouse-control/</loc>
+        <lastmod>2026-02-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://pydoll.tech/docs/pt/features/automation/mouse-control/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://pydoll.tech/docs/features/automation/mouse-control/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://pydoll.tech/docs/zh/features/automation/mouse-control/"/>
     </url>
     <url>
         <loc>https://pydoll.tech/docs/pt/features/automation/screenshots-and-pdfs/</loc>
