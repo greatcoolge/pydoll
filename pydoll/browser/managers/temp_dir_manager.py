@@ -10,6 +10,7 @@ WINERROR_SHARING_VIOLATION = 32
 
 logger = logging.getLogger(__name__)
 
+
 class TempDirectoryManager:
     """
     Manages temporary directory lifecycle for CDP browser automation.
