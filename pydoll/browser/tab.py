@@ -1441,6 +1441,7 @@ class Tab(FindElementsMixin):
         callback_id = None
 
         async def bypass_cloudflare(event):
+            logger.info(f"[Pydoll] 🚀 bypass_cloudflare 触发, 事件: {event.get('type', 'unknown')}")
             try:
                 await self._bypass_cloudflare(
                     event,
