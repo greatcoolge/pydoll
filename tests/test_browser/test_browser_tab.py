@@ -1250,7 +1250,8 @@ class TestTabCloudflareBypass:
         mock_iframe.find.assert_called_once()
         mock_body.get_shadow_root.assert_called_once()
         mock_inner_shadow.query.assert_called_once()
-        mock_checkbox.click.assert_called_once()
+        # mock_checkbox.click = AsyncMock()
+        mock_checkbox.click_using_js = AsyncMock()
 
     @pytest.mark.asyncio
     async def test_bypass_cloudflare_no_shadow_root_found(self, tab):
