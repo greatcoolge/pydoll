@@ -644,6 +644,12 @@ class WebElement(FindElementsMixin):  # noqa: PLR0904
     async def click_with_js_coords(self, hold_time: float = 0.1):
         """使用JS获取坐标，再用CDP鼠标事件点击（避免iframe坐标问题）"""
         bounds = await self.get_bounds_using_js()
+        x, y = bounds["x"], bounds["y"]
+        w, h = bounds["width"], bounds["height"]
+
+        logger.info(
+            f"[BYPASS] 坐标: {x:.0f},{y:.0f} {w:.0f}x{h:.0f}"
+        )
         center_x = bounds['x'] + bounds['width'] / 2
         center_y = bounds['y'] + bounds['height'] / 2
 
