@@ -110,8 +110,10 @@ class TempDirectoryManager:
                 except PermissionError:
                     continue
 
-            logger.warning(f"Failed to delete after retries: {path}")
-            raise exc_value  # 确保未匹配的异常被重新抛出
+            logger.warning(f"Failed to delete after retries: {path}")  
+            raise exc_value  # 关键：重新抛出原始异常  
+  
+        raise exc_value
 
     @staticmethod
     def _is_known_locked_file(path: str) -> bool:
