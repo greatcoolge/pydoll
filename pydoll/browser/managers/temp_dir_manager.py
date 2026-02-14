@@ -80,10 +80,42 @@ class TempDirectoryManager:
         Note:
             Handles Chromium-specific locked files like CrashpadMetrics.
         """
-        matches = ['CrashpadMetrics-active.pma']
-        match_substrings = ['Safe Browsing', 'Safe Browsing Cookies']
-        # Extra patterns commonly locked on Windows; compare case-insensitively
-        windows_locked_substrings = [
+        exc_type, exc_value, _ = exc_info
+
+        # Windows file lock (PermissionError or OSError winerror=32)
+        if (
+            exc_type is PermissionError
+            or (exc_type is OSError and getattr(exc_value, "winerror", None) == 32)
+        ):
+            # Fast-path for known locked files
+            if self._is_known_locked_file(path):
+                try:
+                    self.retry_process_file(func, path)
+                    return
+                except PermissionError:
+                    logger.warning(f"Ignoring locked Chrome file during cleanup: {path}")
+                    return
+
+            # Generic retry fallback for unknown locked files
+            for _ in range(5):
+                time.sleep(0.5)
+                try:
+                    func(path)
+                    return
+                except PermissionError:
+                    continue
+
+            logger.warning(f"Failed to delete after retries: {path}")
+            return
+
+        # For other errors, re-raise
+        raise exc_value
+
+
+    def _is_known_locked_file(self, path: str) -> bool:
+        """Check if path matches known Chromium locked file patterns."""
+        path_lc = path.lower()
+        known_patterns = [
             '\\cache\\',
             '/cache/',
             'no_vary_search',
@@ -97,33 +129,15 @@ class TempDirectoryManager:
             '/local storage/leveldb/',
             'leveldb',
             'indexeddb',
-            '\\Session Storage\\',  # 新增
-            '/Session Storage/',   # 新增
-            'LOG',                 # 新增
+            '\\Session Storage\\',
+            '/Session Storage/',
+            'LOG',
+            'Reporting and NEL',
+            'GPUCache',
+            'Code Cache',
+            'Service Worker',
         ]
-        exc_type, exc_value, _ = exc_info
-
-        if exc_type is PermissionError:
-            filename = Path(path).name
-            # Known Chromium files that may remain locked briefly on Windows
-            path_lc = path.lower()
-            windows_match = os.name == 'nt' and any(
-                substr in path_lc for substr in windows_locked_substrings
-            )
-            if (
-                filename in matches
-                or any(substr in path for substr in match_substrings)
-                or windows_match
-            ):
-                try:
-                    self.retry_process_file(func, path)
-                    return
-                except PermissionError:
-                    logger.warning(f'Ignoring locked Chrome file during cleanup: {path}')
-                    return
-        elif exc_type is OSError:
-            return
-        raise exc_value
+        return any(substr in path_lc for substr in known_patterns)
 
     def cleanup(self):
         """
