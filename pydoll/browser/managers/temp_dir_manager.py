@@ -108,10 +108,10 @@ class TempDirectoryManager:
                     continue
 
             logger.warning(f"Failed to delete after retries: {path}")
-            raise exc_value  # 关键：重新抛出  
-  
-        elif exc_type is OSError:  
-            return  
+            raise exc_value  # 关键：重新抛出
+
+        elif exc_type is OSError:
+            return
 
         raise exc_value
 
