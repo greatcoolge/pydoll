@@ -82,7 +82,10 @@ class TempDirectoryManager:
         Note:
             Handles Chromium-specific locked files like CrashpadMetrics.
         """
-        exc_type, exc_value, _ = exc_info
+        exc_type, exc_value, _ = exc_info  
+        if exc_type is PermissionError or (exc_type is OSError and getattr(exc_value, "winerror", None) == 32):  
+            is_known = self._is_known_locked_file(path)  
+            logger.debug(f"Path {path} known locked: {is_known}")
 
         # Windows file lock (PermissionError or OSError winerror=32)
         if (
