@@ -185,6 +185,11 @@ def test_handle_cleanup_error(temp_manager):
     path = "/tmp/test.file"
     exc = PermissionError("Access denied")
 
+    print(
+        "Is known:",
+        temp_manager._is_known_locked_file(path),
+    )
+
     with pytest.raises(PermissionError) as e:
         temp_manager.handle_cleanup_error(func_mock, path, (PermissionError, exc, None))
     assert e.value is exc
