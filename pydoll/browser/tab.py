@@ -1872,9 +1872,9 @@ class Tab(FindElementsMixin):
             logger.info("[BYPASS] 6. 找到复选框")
 
             # 🔴🔴🔴 2. 找到后，等一会儿，让它稳定
-            await asyncio.sleep(random.uniform(20, 30))  # 等 2-4 秒
+            await asyncio.sleep(random.uniform(20, 30))
             logger.info("[BYPASS] 等待验证框稳定")
-  
+
             # 🔴🔴🔴 6. 滚动到视图（关键！）
             await checkbox.scroll_into_view()
             await asyncio.sleep(0.5)
