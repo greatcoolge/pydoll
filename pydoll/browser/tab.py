@@ -1871,6 +1871,10 @@ class Tab(FindElementsMixin):
                 return
             logger.info("[BYPASS] 6. 找到复选框")
 
+            # 🔴🔴🔴 2. 找到后，等一会儿，让它稳定
+            await asyncio.sleep(random.uniform(20, 30))  # 等 2-4 秒
+            logger.info("[BYPASS] 等待验证框稳定")
+  
             # 🔴🔴🔴 6. 滚动到视图（关键！）
             await checkbox.scroll_into_view()
             await asyncio.sleep(0.5)
@@ -1878,7 +1882,7 @@ class Tab(FindElementsMixin):
 
             # 7. 点击
             await checkbox.click_using_js()
-            await asyncio.sleep(0.5)  # 等待点击生效
+            await asyncio.sleep(8)  # 等待点击生效
             logger.info("[BYPASS] ✅ JS 点击成功")
 
         except Exception as exc:
