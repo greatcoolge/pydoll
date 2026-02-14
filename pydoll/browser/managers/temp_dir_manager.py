@@ -86,11 +86,15 @@ class TempDirectoryManager:
 
         if (
             exc_type is PermissionError
-            or (exc_type is OSError and getattr(exc_value, "winerror", None) == WINERROR_SHARING_VIOLATION)
+            or (
+                exc_type is OSError
+                and getattr(exc_value, "winerror", None)
+                == WINERROR_SHARING_VIOLATION
+            )
         ):
             is_known = self._is_known_locked_file(path)
             logger.debug(f"Path {path} known locked: {is_known}")  # 调试用
-  
+
             if is_known:
                 try:
                     self.retry_process_file(func, path)
