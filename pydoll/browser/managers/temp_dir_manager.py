@@ -120,27 +120,26 @@ class TempDirectoryManager:
         """Check if path matches known Chromium locked file patterns."""
         path_lc = path.lower()
         known_patterns = [
-            'crashpadmetrics',
+            'crashpadmetrics-active.pma',
+            'safe browsing',
+            'safe browsing cookies',
             '\\cache\\',
             '/cache/',
             'no_vary_search',
-            'journal.baj',
+            'journal.baj', 
             '\\network\\cookies',
-            '/network/cookies',
+            '/network/cookies', 
             'cookies-journal',
             '\\local storage\\',
-            '/local storage/',
+            '/local storage/', 
             '\\local storage\\leveldb\\',
-            '/local storage/leveldb/',
+            '/local storage/leveldb/', 
             'leveldb',
             'indexeddb',
-            '\\Session Storage\\',
-            '/Session Storage/',
-            'LOG',
-            'Reporting and NEL',
-            'GPUCache',
-            'Code Cache',
-            'Service Worker',
+            '\\session storage\\',
+            '/session storage/',
+            'log',
+            'reporting and nel',
         ]
         return any(substr in path_lc for substr in known_patterns)
 
