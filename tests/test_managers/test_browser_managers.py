@@ -167,14 +167,19 @@ def test_handle_cleanup_error(temp_manager):
     path = "/tmp/CrashpadMetrics-active.pma"
 
     temp_manager.handle_cleanup_error(func_mock, path, (PermissionError, PermissionError(), None))
-    temp_manager.retry_process_file.assert_called_once_with(func_mock, path)
+    temp_manager.retry_process_file.assert_called_once_with(func_mock, path)  
+
+    # 重置Mock状态  
+    temp_manager.retry_process_file.reset_mock()
 
     # matched permission error - should not raise, only log and continue
     temp_manager.retry_process_file = Mock()
     temp_manager.retry_process_file.side_effect = PermissionError
     path = "/tmp/CrashpadMetrics-active.pma"
-    temp_manager.handle_cleanup_error(func_mock, path, (PermissionError, PermissionError(), None))
+    temp_manager.handle_cleanup_error(func_mock, path, (PermissionError, PermissionError(), None))  
 
+    # 重置Mock状态  
+    temp_manager.retry_process_file.reset_mock()
     # unmatched permission error
     temp_manager.retry_process_file = Mock()
     path = "/tmp/test.file"
