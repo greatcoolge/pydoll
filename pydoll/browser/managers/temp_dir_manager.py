@@ -87,7 +87,10 @@ class TempDirectoryManager:
         # Windows file lock (PermissionError or OSError winerror=32)
         if (
             exc_type is PermissionError
-            or (exc_type is OSError and getattr(exc_value, "winerror", None) == WINERROR_SHARING_VIOLATION)
+            or (
+                exc_type is OSError
+                and getattr(exc_value, "winerror", None) == WINERROR_SHARING_VIOLATION
+            )
         ):
             # Fast-path for known locked files
             if self._is_known_locked_file(path):
