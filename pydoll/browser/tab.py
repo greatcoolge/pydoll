@@ -1877,8 +1877,9 @@ class Tab(FindElementsMixin):
             logger.info("[BYPASS] 7. 滚动完成")
 
             # 7. 点击
-            await checkbox.click()
-            logger.info("[BYPASS] 8. ✅ 点击完成")
+            await checkbox.click_using_js()
+            await asyncio.sleep(0.5)  # 等待点击生效
+            logger.info("[BYPASS] ✅ JS 点击成功")
 
         except Exception as exc:
             logger.error(f'Error in cloudflare bypass: {exc}')
