@@ -82,21 +82,21 @@ class TempDirectoryManager:
         Note:
             Handles Chromium-specific locked files like CrashpadMetrics.
         """
-        exc_type, exc_value, _ = exc_info  
+        exc_type, exc_value, _ = exc_info
 
-        if (  
-            exc_type is PermissionError  
-            or (exc_type is OSError and getattr(exc_value, "winerror", None) == WINERROR_SHARING_VIOLATION)  
-        ):  
-            is_known = self._is_known_locked_file(path)  
-            logger.debug(f"Path {path} known locked: {is_known}")  # 调试用  
+        if (
+            exc_type is PermissionError
+            or (exc_type is OSError and getattr(exc_value, "winerror", None) == WINERROR_SHARING_VIOLATION)
+        ):
+            is_known = self._is_known_locked_file(path)
+            logger.debug(f"Path {path} known locked: {is_known}")  # 调试用
   
-            if is_known:  
-                try:  
-                    self.retry_process_file(func, path)  
-                    return  
-                except PermissionError:  
-                    logger.warning(f"Ignoring locked Chrome file during cleanup: {path}")  
+            if is_known:
+                try:
+                    self.retry_process_file(func, path)
+                    return
+                except PermissionError:
+                    logger.warning(f"Ignoring locked Chrome file during cleanup: {path}")
                     return
             # Generic retry fallback for unknown locked files
             for _ in range(5):
