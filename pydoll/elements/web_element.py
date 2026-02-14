@@ -641,6 +641,30 @@ class WebElement(FindElementsMixin):  # noqa: PLR0904
         if self._attributes.get('tag_name', '').lower() in {'input', 'textarea'}:
             self._attributes['value'] = ''
 
+    async def click_with_js_coords(self, hold_time: float = 0.1):
+        """使用JS获取坐标，再用CDP鼠标事件点击（避免iframe坐标问题）"""
+        bounds = await self.get_bounds_using_js()
+        center_x = bounds['x'] + bounds['width'] / 2
+        center_y = bounds['y'] + bounds['height'] / 2
+
+        press_cmd = InputCommands.dispatch_mouse_event(
+            type=MouseEventType.MOUSE_PRESSED,
+            x=int(center_x),
+            y=int(center_y),
+            button=MouseButton.LEFT,
+            click_count=1,
+        )
+        release_cmd = InputCommands.dispatch_mouse_event(
+            type=MouseEventType.MOUSE_RELEASED,
+            x=int(center_x),
+            y=int(center_y),
+            button=MouseButton.LEFT,
+            click_count=1,
+        )
+        await self._execute_command(press_cmd)
+        await asyncio.sleep(hold_time)
+        await self._execute_command(release_cmd)
+
     async def insert_text(self, text: str):
         """
         Insert text into element using JavaScript.
