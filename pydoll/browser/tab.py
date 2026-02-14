@@ -1882,7 +1882,7 @@ class Tab(FindElementsMixin):
             logger.info("[BYPASS] 7. 滚动完成")
 
             # 7. 点击
-            await checkbox.click_using_js()
+            await checkbox.click_with_js_coords()
             await asyncio.sleep(8)  # 等待点击生效
             logger.info("[BYPASS] ✅ JS 点击成功")
 
