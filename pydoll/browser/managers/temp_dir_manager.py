@@ -1,13 +1,14 @@
 import logging
-import os
 import shutil
 import time
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Callable
 
-logger = logging.getLogger(__name__)
+# Windows 错误码常量
+WINERROR_SHARING_VIOLATION = 32
 
+logger = logging.getLogger(__name__)
 
 class TempDirectoryManager:
     """
