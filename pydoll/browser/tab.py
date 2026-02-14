@@ -1833,16 +1833,50 @@ class Tab(FindElementsMixin):
         """
         try:
             timeout_int = int(time_to_wait_captcha)
+        
+            # 1. 找到 shadow root
             shadow_root = await self._find_cloudflare_shadow_root(
                 timeout=time_to_wait_captcha,
             )
+            if not shadow_root:
+                logger.warning("[Pydoll] 找不到 Cloudflare shadow root")
+                return
+        
+            # 2. 找 iframe
             iframe = await shadow_root.query(_CLOUDFLARE_IFRAME_SELECTOR, timeout=timeout_int)
+            if not iframe:
+                logger.warning("[Pydoll] 找不到 Cloudflare iframe")
+                return
+        
+            # 3. 找 body
             body = await iframe.find(tag_name='body', timeout=timeout_int)
+            if not body:
+                logger.warning("[Pydoll] 找不到 iframe body")
+                return
+        
+            # 4. 进 inner shadow
             inner_shadow = await body.get_shadow_root(timeout=time_to_wait_captcha)
+            if not inner_shadow:
+                logger.warning("[Pydoll] 找不到 inner shadow root")
+                return
+        
+            # 5. 找复选框
             checkbox = await inner_shadow.query(_CLOUDFLARE_CHECKBOX_SELECTOR, timeout=timeout_int)
+            if not checkbox:
+                logger.warning("[Pydoll] 找不到复选框元素")
+                return
+        
+            # 🔴🔴🔴 6. 滚动到视图（关键！）
+            await checkbox.scroll_into_view()
+            await asyncio.sleep(0.5)  # 等待滚动完成
+        
+            # 7. 点击
             await checkbox.click()
+            logger.debug("[Pydoll] ✅ 已点击 Cloudflare 复选框")
+        
         except Exception as exc:
             logger.error(f'Error in cloudflare bypass: {exc}')
+            # 不抛出异常，让上层处理
 
 
 class _DownloadHandle:
