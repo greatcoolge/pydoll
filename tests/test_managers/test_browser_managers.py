@@ -190,6 +190,8 @@ def test_handle_cleanup_error(temp_manager):
         temp_manager._is_known_locked_file(path),
     )
 
+    func_mock = Mock(side_effect=PermissionError("Access denied"))  # 添加这行
+
     with pytest.raises(PermissionError) as e:
         temp_manager.handle_cleanup_error(func_mock, path, (PermissionError, exc, None))
     assert e.value is exc
