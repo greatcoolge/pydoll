@@ -151,11 +151,11 @@ class TempDirectoryManager:
             'log',
             'reporting and nel',
         ]
-        # 确保路径包含目录分隔符，避免误匹配文件名  
+        # 确保路径包含目录分隔符，避免误匹配文件名
         return any(
-            (substr in path_lc) and 
+            (substr in path_lc) and
             ('\\' in substr or '/' in substr or substr.endswith('.pma') or substr == 'log')
-            for substr in known_patterns 
+            for substr in known_patterns
         )
 
     def cleanup(self):
