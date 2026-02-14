@@ -653,6 +653,8 @@ class WebElement(FindElementsMixin):  # noqa: PLR0904
         center_x = bounds['x'] + bounds['width'] / 2
         center_y = bounds['y'] + bounds['height'] / 2
 
+        logger.info(f"[BYPASS] 点击坐标: ({center_x:.1f}, {center_y:.1f})")
+
         press_cmd = InputCommands.dispatch_mouse_event(
             type=MouseEventType.MOUSE_PRESSED,
             x=int(center_x),
