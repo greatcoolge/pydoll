@@ -1833,47 +1833,52 @@ class Tab(FindElementsMixin):
         it, and clicks the actual checkbox element (``span.cb-i``).
         """
         try:
+            logger.info("[BYPASS] 1. 开始")
             timeout_int = int(time_to_wait_captcha)
 
             # 1. 找到 shadow root
-            shadow_root = await self._find_cloudflare_shadow_root(
-                timeout=time_to_wait_captcha,
-            )
+            shadow_root = await self._find_cloudflare_shadow_root(timeout=time_to_wait_captcha)
             if not shadow_root:
-                logger.warning("[Pydoll] 找不到 Cloudflare shadow root")
+                logger.warning("[BYPASS] ❌ 1.5 找不到 shadow root")
                 return
+            logger.info("[BYPASS] 2. 找到 shadow root")
 
             # 2. 找 iframe
             iframe = await shadow_root.query(_CLOUDFLARE_IFRAME_SELECTOR, timeout=timeout_int)
             if not iframe:
-                logger.warning("[Pydoll] 找不到 Cloudflare iframe")
+                logger.warning("[BYPASS] ❌ 2.5 找不到 iframe")
                 return
+            logger.info("[BYPASS] 3. 找到 iframe")
 
             # 3. 找 body
             body = await iframe.find(tag_name='body', timeout=timeout_int)
             if not body:
-                logger.warning("[Pydoll] 找不到 iframe body")
+                logger.warning("[BYPASS] ❌ 3.5 找不到 body")
                 return
+            logger.info("[BYPASS] 4. 找到 body")
 
             # 4. 进 inner shadow
             inner_shadow = await body.get_shadow_root(timeout=time_to_wait_captcha)
             if not inner_shadow:
-                logger.warning("[Pydoll] 找不到 inner shadow root")
+                logger.warning("[BYPASS] ❌ 4.5 找不到 inner shadow")
                 return
+            logger.info("[BYPASS] 5. 找到 inner shadow")
 
             # 5. 找复选框
             checkbox = await inner_shadow.query(_CLOUDFLARE_CHECKBOX_SELECTOR, timeout=timeout_int)
             if not checkbox:
-                logger.warning("[Pydoll] 找不到复选框元素")
+                logger.warning("[BYPASS] ❌ 5.5 找不到复选框")
                 return
+            logger.info("[BYPASS] 6. 找到复选框")
 
             # 🔴🔴🔴 6. 滚动到视图（关键！）
             await checkbox.scroll_into_view()
-            await asyncio.sleep(0.5)  # 等待滚动完成
+            await asyncio.sleep(0.5)
+            logger.info("[BYPASS] 7. 滚动完成")
 
             # 7. 点击
             await checkbox.click()
-            logger.debug("[Pydoll] ✅ 已点击 Cloudflare 复选框")
+            logger.info("[BYPASS] 8. ✅ 点击完成")
 
         except Exception as exc:
             logger.error(f'Error in cloudflare bypass: {exc}')
