@@ -110,8 +110,8 @@ class TempDirectoryManager:
                 except PermissionError:
                     continue
 
-            logger.warning(f"Failed to delete after retries: {path}")  
-            raise exc_value  # 关键：重新抛出原始异常  
+            logger.warning(f"Failed to delete after retries: {path}")
+            raise exc_value  # 关键：重新抛出原始异常
   
         raise exc_value
 
