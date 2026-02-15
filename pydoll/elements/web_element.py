@@ -685,9 +685,7 @@ class WebElement(FindElementsMixin):  # noqa: PLR0904
     await main_handler.execute_command(release_cmd)
 
     logger.info(f"[BYPASS] 点击完成 ({center_x}, {center_y})")
-    
- 
- 
+
 async def get_global_bounds(self) -> dict[str, int]:
     """获取元素相对于顶层页面的全局坐标（整数物理像素）"""
     response = await self.execute_script("""
@@ -699,6 +697,7 @@ async def get_global_bounds(self) -> dict[str, int]:
         let height = rect.height;
         let win = window;
 
+        // 递归累加所有父 iframe 偏移
         while (win !== win.top) {
             const iframe = win.frameElement;
             if (iframe) {
@@ -709,9 +708,11 @@ async def get_global_bounds(self) -> dict[str, int]:
             win = win.parent;
         }
 
+        // 顶层滚动偏移
         x += win.scrollX;
         y += win.scrollY;
 
+        // 考虑设备像素比
         const dpr = window.devicePixelRatio || 1;
 
         return {
@@ -725,30 +726,39 @@ async def get_global_bounds(self) -> dict[str, int]:
     return json.loads(response['result']['result']['value'])
 
 
-async def click_global_coords_retry(self, hold_time: float = 0.1, offset_range: int = 1, max_retries: int = 3):
+async def click_global_coords_retry(
+    self,
+    hold_time: float = 0.1,
+    offset_range: int = 1,
+    max_retries: int = 3
+):
     """
     带重试的全局坐标点击
-    - hold_time: 鼠标按下保持时间
-    - offset_range: 微偏移范围，提高容错
-    - max_retries: 点击失败重试次数
+
+    Args:
+        hold_time: 鼠标按下保持时间
+        offset_range: 微偏移范围，提高容错
+        max_retries: 点击失败重试次数
     """
     for attempt in range(max_retries):
         try:
             bounds = await self.get_global_bounds()
 
+            # 计算中心点
             center_x = bounds['x'] + bounds['width'] // 2
             center_y = bounds['y'] + bounds['height'] // 2
 
+            # 添加微偏移，提高容错
             center_x += random.randint(-offset_range, offset_range)
             center_y += random.randint(-offset_range, offset_range)
 
             main_handler = self._connection_handler
 
-            # 移动鼠标
+            # 鼠标移动
             move_cmd = InputCommands.dispatch_mouse_event(
                 type=MouseEventType.MOUSE_MOVED,
                 x=center_x,
-                y=center_y,
+                y=center_y
             )
             await main_handler.execute_command(move_cmd)
 
@@ -778,7 +788,9 @@ async def click_global_coords_retry(self, hold_time: float = 0.1, offset_range: 
             return
 
         except Exception as e:
-            logger.warning(f"[BYPASS] 点击失败, 尝试 {attempt + 1}/{max_retries}: {e}")
+            logger.warning(
+                f"[BYPASS] 点击失败, 尝试 {attempt + 1}/{max_retries}: {e}"
+            )
             await asyncio.sleep(0.05 * (attempt + 1))
 
     raise RuntimeError(f"[BYPASS] 点击失败: 尝试 {max_retries} 次均未成功")
