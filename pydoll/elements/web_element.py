@@ -649,14 +649,14 @@ class WebElement(FindElementsMixin):  # noqa: PLR0904
             try {
                 const elem = this;
                 const rect = elem.getBoundingClientRect();
-            
+
                 console.log("[DEBUG] 元素在iframe内坐标:", rect.left, rect.top);
-            
+
                 let x = rect.left;
                 let y = rect.top;
                 let width = rect.width;
                 let height = rect.height;
-            
+
                 let win = window;
                 let level = 0;
 
@@ -670,17 +670,20 @@ class WebElement(FindElementsMixin):  # noqa: PLR0904
                             win = win.parent;
                             continue;
                         }
-                    
+
                         console.log("[DEBUG] 第", level, "层: iframe 标签", iframe.tagName);
-                    
+
                         const iframeRect = iframe.getBoundingClientRect();
-                        console.log("[DEBUG] 第", level, "层: iframe 位置", iframeRect.left, iframeRect.top);
-                    
+                        console.log(
+                            "[DEBUG] 第", level, "层: iframe 位置",
+                            iframeRect.left, iframeRect.top
+                        );
+
                         x += iframeRect.left;
                         y += iframeRect.top;
-                    
+
                         console.log("[DEBUG] 累加后 x,y:", x, y);
-                    
+
                         win = win.parent;
                     }
                     console.log("[DEBUG] 总共累加", level, "层 iframe");
@@ -730,10 +733,8 @@ class WebElement(FindElementsMixin):  # noqa: PLR0904
             logs = await self.page.get_console_logs()
             for log in logs:
                 if '[DEBUG]' in log:
-                    import logging
-                    logger = logging.getLogger(__name__)
                     logger.info(f"[CONSOLE] {log}")
-        except Exception as e:
+        except Exception:
             # 如果获取日志失败，不影响主流程
             pass
 
