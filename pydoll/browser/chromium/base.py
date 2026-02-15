@@ -871,7 +871,7 @@ class Browser(ABC):  # noqa: PLR0904
 
         return tab_id
 
-    async def _is_browser_running(self, timeout: int = 30) -> bool:
+    async def _is_browser_running(self, timeout: int = 10) -> bool:
         """Check if browser process is running and CDP endpoint is responsive."""
         for _ in range(timeout):
             if await self._connection_handler.ping():
