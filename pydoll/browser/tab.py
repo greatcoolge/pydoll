@@ -1834,61 +1834,24 @@ class Tab(FindElementsMixin):
         it, and clicks the actual checkbox element (``span.cb-i``).
         """
         try:
-            logger.info("[BYPASS] 1. 开始")
             timeout_int = int(time_to_wait_captcha)
-
-            # 1. 找到 shadow root
-            shadow_root = await self._find_cloudflare_shadow_root(timeout=time_to_wait_captcha)
-            if not shadow_root:
-                logger.warning("[BYPASS] ❌ 1.5 找不到 shadow root")
-                return
-            logger.info("[BYPASS] 2. 找到 shadow root")
-
-            # 2. 找 iframe
+            shadow_root = await self._find_cloudflare_shadow_root(
+                timeout=time_to_wait_captcha,
+            )
             iframe = await shadow_root.query(_CLOUDFLARE_IFRAME_SELECTOR, timeout=timeout_int)
-            if not iframe:
-                logger.warning("[BYPASS] ❌ 2.5 找不到 iframe")
-                return
-            logger.info("[BYPASS] 3. 找到 iframe")
-
-            # 3. 找 body
             body = await iframe.find(tag_name='body', timeout=timeout_int)
-            if not body:
-                logger.warning("[BYPASS] ❌ 3.5 找不到 body")
-                return
-            logger.info("[BYPASS] 4. 找到 body")
 
-            # 4. 进 inner shadow
-            inner_shadow = await body.get_shadow_root(timeout=time_to_wait_captcha)
-            if not inner_shadow:
-                logger.warning("[BYPASS] ❌ 4.5 找不到 inner shadow")
-                return
-            logger.info("[BYPASS] 5. 找到 inner shadow")
+            # 添加重试逻辑获取内层 shadow root
+            try:
+                inner_shadow = await body.get_shadow_root(timeout=time_to_wait_captcha)
+            except WaitElementTimeout:
+                logger.warning("Inner shadow root timeout, retrying with longer timeout")
+                inner_shadow = await body.get_shadow_root(timeout=time_to_wait_captcha * 2)
 
-            # 5. 找复选框
             checkbox = await inner_shadow.query(_CLOUDFLARE_CHECKBOX_SELECTOR, timeout=timeout_int)
-            if not checkbox:
-                logger.warning("[BYPASS] ❌ 5.5 找不到复选框")
-                return
-            logger.info("[BYPASS] 6. 找到复选框")
-
-            # 🔴🔴🔴 2. 找到后，等一会儿，让它稳定
-            await asyncio.sleep(random.uniform(20, 30))
-            logger.info("[BYPASS] 等待验证框稳定")
-
-            # 🔴🔴🔴 6. 滚动到视图（关键！）
-            await checkbox.scroll_into_view()
-            await asyncio.sleep(0.5)
-            logger.info("[BYPASS] 7. 滚动完成")
-
-            # 7. 点击
-            await checkbox.click_global_coords_retry()
-            await asyncio.sleep(8)  # 等待点击生效
-            logger.info("[BYPASS] ✅ JS 点击成功")
-
+            await checkbox.click()
         except Exception as exc:
             logger.error(f'Error in cloudflare bypass: {exc}')
-            # 不抛出异常，让上层处理
 
 
 class _DownloadHandle:
