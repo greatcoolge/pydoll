@@ -643,43 +643,75 @@ class WebElement(FindElementsMixin):  # noqa: PLR0904
             self._attributes['value'] = ''
 
     async def get_global_bounds(self) -> dict[str, int]:
-        """获取元素相对于顶层页面的全局坐标（整数物理像素）"""
+        """获取元素相对于顶层页面的全局坐标（整数物理像素，跨域安全版）"""
+
         response = await self.execute_script("""
-            const elem = this;
-            const rect = elem.getBoundingClientRect();
-            let x = rect.left;
-            let y = rect.top;
-            let width = rect.width;
-            let height = rect.height;
-            let win = window;
+            try {
+                const elem = this;
+                const rect = elem.getBoundingClientRect();
 
-            // 递归累加所有父 iframe 偏移
-            while (win !== win.top) {
-                const iframe = win.frameElement;
-                if (iframe) {
-                    const iframeRect = iframe.getBoundingClientRect();
-                    x += iframeRect.left;
-                    y += iframeRect.top;
+                let x = rect.left;
+                let y = rect.top;
+                let width = rect.width;
+                let height = rect.height;
+
+                let win = window;
+
+                // 累加父 iframe 偏移（跨域安全）
+                try {
+                    while (win !== win.top) {
+                        const iframe = win.frameElement;
+                        if (!iframe) break;
+
+                        const iframeRect = iframe.getBoundingClientRect();
+                        x += iframeRect.left;
+                        y += iframeRect.top;
+
+                        win = win.parent;
+                    }
+                } catch (e) {
+                    // 跨域访问 parent 会抛异常，这里忽略
                 }
-                win = win.parent;
+
+                // 顶层滚动偏移
+                x += window.scrollX || 0;
+                y += window.scrollY || 0;
+
+                const dpr = window.devicePixelRatio || 1;
+
+                return {
+                    success: true,
+                    x: Math.round(x * dpr),
+                    y: Math.round(y * dpr),
+                    width: Math.round(width * dpr),
+                    height: Math.round(height * dpr)
+                };
+            } catch (err) {
+                return {
+                    success: false,
+                    error: err.message
+                };
             }
-
-            // 顶层滚动偏移
-            x += win.scrollX;
-            y += win.scrollY;
-
-            // 考虑设备像素比
-            const dpr = window.devicePixelRatio || 1;
-
-            return {
-                x: Math.round(x * dpr),
-                y: Math.round(y * dpr),
-                width: Math.round(width * dpr),
-                height: Math.round(height * dpr)
-            };
         """, return_by_value=True)
 
-        return json.loads(response['result']['result']['value'])
+        # ---------- Python 侧安全解析 ----------
+
+        result = response.get("result", {}).get("result", {})
+
+        if "value" not in result:
+            raise RuntimeError(f"[BYPASS] JS 无返回值: {response}")
+
+        value = result["value"]
+
+        if not value.get("success"):
+            raise RuntimeError(f"[BYPASS] JS 执行失败: {value.get('error')}")
+
+        return {
+            "x": value["x"],
+            "y": value["y"],
+            "width": value["width"],
+            "height": value["height"],
+        }
 
     async def click_global_coords_retry(
         self,
