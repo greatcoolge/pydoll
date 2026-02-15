@@ -681,7 +681,6 @@ class WebElement(FindElementsMixin):  # noqa: PLR0904
 
         return json.loads(response['result']['result']['value'])
 
-
     async def click_global_coords_retry(
         self,
         hold_time: float = 0.1,
