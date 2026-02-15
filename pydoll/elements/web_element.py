@@ -698,6 +698,7 @@ class WebElement(FindElementsMixin):  # noqa: PLR0904
         for attempt in range(max_retries):
             try:
                 bounds = await self.get_global_bounds()
+                logger.info(f"[BYPASS] bounds 返回: {bounds}")
 
                 # 计算中心点
                 center_x = bounds['x'] + bounds['width'] // 2
