@@ -730,7 +730,9 @@ class WebElement(FindElementsMixin):  # noqa: PLR0904
 
         # 执行 get_global_bounds 后获取控制台日志
         try:
-            logs = await self.page.get_console_logs()
+            logs = await (
+                self.page.get_console_logs()  # type: ignore[attr-defined]
+            )
             for log in logs:
                 if '[DEBUG]' in log:
                     logger.info(f"[CONSOLE] {log}")
