@@ -1879,6 +1879,11 @@ class Tab(FindElementsMixin):
                 logger.warning("[BYPASS] checkbox not found")
                 return
 
+            # 🔴🔴🔴 在这里加！
+            tag_name = await checkbox.tag_name
+            type_attr = await checkbox.get_attribute('type')
+            logger.info(f"[BYPASS] 找到元素: tag={tag_name}, type={type_attr}")
+
             # 6️⃣ 稍微等一下，让 DOM 稳定（不要太久）
             await asyncio.sleep(random.uniform(1.2, 2.3))
 
