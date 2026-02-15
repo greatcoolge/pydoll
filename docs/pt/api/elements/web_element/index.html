@@ -3321,10 +3321,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#pydoll.elements.web_element.WebElement.click_with_js_coords" class="md-nav__link">
+  <a href="#pydoll.elements.web_element.WebElement.get_global_bounds" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;click_with_js_coords
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get_global_bounds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydoll.elements.web_element.WebElement.click_global_coords_retry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;click_global_coords_retry
       
     </span>
   </a>
@@ -4913,10 +4924,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#pydoll.elements.web_element.WebElement.click_with_js_coords" class="md-nav__link">
+  <a href="#pydoll.elements.web_element.WebElement.get_global_bounds" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;click_with_js_coords
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get_global_bounds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydoll.elements.web_element.WebElement.click_global_coords_retry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;click_global_coords_retry
       
     </span>
   </a>
@@ -6621,8 +6643,8 @@ Dispatches <code>input</code> and <code>change</code> events so frameworks detec
 <div class="doc doc-object doc-function">
 
 
-<h3 id="pydoll.elements.web_element.WebElement.click_with_js_coords" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">click_with_js_coords</span>
+<h3 id="pydoll.elements.web_element.WebElement.get_global_bounds" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_global_bounds</span>
 
 
   <span class="doc doc-labels">
@@ -6630,12 +6652,108 @@ Dispatches <code>input</code> and <code>change</code> events so frameworks detec
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">click_with_js_coords</span><span class="p">(</span><span class="n">hold_time</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_global_bounds</span><span class="p">()</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>使用JS获取坐标，再用CDP鼠标事件点击（避免iframe坐标问题）</p>
+        <p>获取元素相对于顶层页面的全局坐标（整数物理像素）</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="pydoll.elements.web_element.WebElement.click_global_coords_retry" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">click_global_coords_retry</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">click_global_coords_retry</span><span class="p">(</span><span class="n">hold_time</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">offset_range</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_retries</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>带重试的全局坐标点击</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>hold_time</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>鼠标按下保持时间</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="float">float</span></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>0.1</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>offset_range</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>微偏移范围，提高容错</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>1</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_retries</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>点击失败重试次数</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>3</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     </div>
