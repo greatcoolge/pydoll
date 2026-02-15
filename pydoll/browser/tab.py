@@ -1883,11 +1883,11 @@ class Tab(FindElementsMixin):
             tag_name = checkbox.tag_name  # 不加 await
             if tag_name is None:
                 tag_name = 'unknown'
-    
+
             type_attr = checkbox.get_attribute('type')  # 不加 await
             if type_attr is None:
                 type_attr = 'unknown'
-    
+
             logger.info(f"[BYPASS] 找到元素: tag={tag_name}, type={type_attr}")
 
             # 6️⃣ 稍微等一下，让 DOM 稳定（不要太久）
