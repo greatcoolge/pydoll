@@ -642,158 +642,114 @@ class WebElement(FindElementsMixin):  # noqa: PLR0904
         if self._attributes.get('tag_name', '').lower() in {'input', 'textarea'}:
             self._attributes['value'] = ''
 
-    async def click_global_coords(self, hold_time: float = 0.1, offset_range: int = 1):
-    """使用全局坐标 + 顶层 session 点击"""
-    bounds = await self.get_global_bounds()
+    async def get_global_bounds(self) -> dict[str, int]:
+        """获取元素相对于顶层页面的全局坐标（整数物理像素）"""
+        response = await self.execute_script("""
+            const elem = this;
+            const rect = elem.getBoundingClientRect();
+            let x = rect.left;
+            let y = rect.top;
+            let width = rect.width;
+            let height = rect.height;
+            let win = window;
 
-    center_x = bounds['x'] + bounds['width'] // 2
-    center_y = bounds['y'] + bounds['height'] // 2
-
-    center_x += random.randint(-offset_range, offset_range)
-    center_y += random.randint(-offset_range, offset_range)
-
-    main_handler = self._connection_handler
-
-    # 鼠标移动
-    move_cmd = InputCommands.dispatch_mouse_event(
-        type=MouseEventType.MOUSE_MOVED,
-        x=center_x,
-        y=center_y,
-    )
-    await main_handler.execute_command(move_cmd)
-
-    # 鼠标按下
-    press_cmd = InputCommands.dispatch_mouse_event(
-        type=MouseEventType.MOUSE_PRESSED,
-        x=center_x,
-        y=center_y,
-        button=MouseButton.LEFT,
-        click_count=1
-    )
-    await main_handler.execute_command(press_cmd)
-
-    await asyncio.sleep(hold_time)
-
-    # 鼠标释放
-    release_cmd = InputCommands.dispatch_mouse_event(
-        type=MouseEventType.MOUSE_RELEASED,
-        x=center_x,
-        y=center_y,
-        button=MouseButton.LEFT,
-        click_count=1
-    )
-    await main_handler.execute_command(release_cmd)
-
-    logger.info(f"[BYPASS] 点击完成 ({center_x}, {center_y})")
-
-async def get_global_bounds(self) -> dict[str, int]:
-    """获取元素相对于顶层页面的全局坐标（整数物理像素）"""
-    response = await self.execute_script("""
-        const elem = this;
-        const rect = elem.getBoundingClientRect();
-        let x = rect.left;
-        let y = rect.top;
-        let width = rect.width;
-        let height = rect.height;
-        let win = window;
-
-        // 递归累加所有父 iframe 偏移
-        while (win !== win.top) {
-            const iframe = win.frameElement;
-            if (iframe) {
-                const iframeRect = iframe.getBoundingClientRect();
-                x += iframeRect.left;
-                y += iframeRect.top;
+            // 递归累加所有父 iframe 偏移
+            while (win !== win.top) {
+                const iframe = win.frameElement;
+                if (iframe) {
+                    const iframeRect = iframe.getBoundingClientRect();
+                    x += iframeRect.left;
+                    y += iframeRect.top;
+                }
+                win = win.parent;
             }
-            win = win.parent;
-        }
 
-        // 顶层滚动偏移
-        x += win.scrollX;
-        y += win.scrollY;
+            // 顶层滚动偏移
+            x += win.scrollX;
+            y += win.scrollY;
 
-        // 考虑设备像素比
-        const dpr = window.devicePixelRatio || 1;
+            // 考虑设备像素比
+            const dpr = window.devicePixelRatio || 1;
 
-        return {
-            x: Math.round(x * dpr),
-            y: Math.round(y * dpr),
-            width: Math.round(width * dpr),
-            height: Math.round(height * dpr)
-        };
-    """, return_by_value=True)
+            return {
+                x: Math.round(x * dpr),
+                y: Math.round(y * dpr),
+                width: Math.round(width * dpr),
+                height: Math.round(height * dpr)
+            };
+        """, return_by_value=True)
 
-    return json.loads(response['result']['result']['value'])
+        return json.loads(response['result']['result']['value'])
 
 
-async def click_global_coords_retry(
-    self,
-    hold_time: float = 0.1,
-    offset_range: int = 1,
-    max_retries: int = 3
-):
-    """
-    带重试的全局坐标点击
+    async def click_global_coords_retry(
+        self,
+        hold_time: float = 0.1,
+        offset_range: int = 1,
+        max_retries: int = 3
+    ):
+        """
+        带重试的全局坐标点击
 
-    Args:
-        hold_time: 鼠标按下保持时间
-        offset_range: 微偏移范围，提高容错
-        max_retries: 点击失败重试次数
-    """
-    for attempt in range(max_retries):
-        try:
-            bounds = await self.get_global_bounds()
+        Args:
+            hold_time: 鼠标按下保持时间
+            offset_range: 微偏移范围，提高容错
+            max_retries: 点击失败重试次数
+        """
+        for attempt in range(max_retries):
+            try:
+                bounds = await self.get_global_bounds()
 
-            # 计算中心点
-            center_x = bounds['x'] + bounds['width'] // 2
-            center_y = bounds['y'] + bounds['height'] // 2
+                # 计算中心点
+                center_x = bounds['x'] + bounds['width'] // 2
+                center_y = bounds['y'] + bounds['height'] // 2
 
-            # 添加微偏移，提高容错
-            center_x += random.randint(-offset_range, offset_range)
-            center_y += random.randint(-offset_range, offset_range)
+                # 添加微偏移，提高容错
+                center_x += random.randint(-offset_range, offset_range)
+                center_y += random.randint(-offset_range, offset_range)
 
-            main_handler = self._connection_handler
+                main_handler = self._connection_handler
 
-            # 鼠标移动
-            move_cmd = InputCommands.dispatch_mouse_event(
-                type=MouseEventType.MOUSE_MOVED,
-                x=center_x,
-                y=center_y
-            )
-            await main_handler.execute_command(move_cmd)
+                # 鼠标移动
+                move_cmd = InputCommands.dispatch_mouse_event(
+                    type=MouseEventType.MOUSE_MOVED,
+                    x=center_x,
+                    y=center_y
+                )
+                await main_handler.execute_command(move_cmd)
 
-            # 鼠标按下
-            press_cmd = InputCommands.dispatch_mouse_event(
-                type=MouseEventType.MOUSE_PRESSED,
-                x=center_x,
-                y=center_y,
-                button=MouseButton.LEFT,
-                click_count=1
-            )
-            await main_handler.execute_command(press_cmd)
+                # 鼠标按下
+                press_cmd = InputCommands.dispatch_mouse_event(
+                    type=MouseEventType.MOUSE_PRESSED,
+                    x=center_x,
+                    y=center_y,
+                    button=MouseButton.LEFT,
+                    click_count=1
+                )
+                await main_handler.execute_command(press_cmd)
 
-            await asyncio.sleep(hold_time)
+                await asyncio.sleep(hold_time)
 
-            # 鼠标释放
-            release_cmd = InputCommands.dispatch_mouse_event(
-                type=MouseEventType.MOUSE_RELEASED,
-                x=center_x,
-                y=center_y,
-                button=MouseButton.LEFT,
-                click_count=1
-            )
-            await main_handler.execute_command(release_cmd)
+                # 鼠标释放
+                release_cmd = InputCommands.dispatch_mouse_event(
+                    type=MouseEventType.MOUSE_RELEASED,
+                    x=center_x,
+                    y=center_y,
+                    button=MouseButton.LEFT,
+                    click_count=1
+                )
+                await main_handler.execute_command(release_cmd)
 
-            logger.info(f"[BYPASS] 点击完成 ({center_x}, {center_y})")
-            return
+                logger.info(f"[BYPASS] 点击完成 ({center_x}, {center_y})")
+                return
 
-        except Exception as e:
-            logger.warning(
-                f"[BYPASS] 点击失败, 尝试 {attempt + 1}/{max_retries}: {e}"
-            )
-            await asyncio.sleep(0.05 * (attempt + 1))
+            except Exception as e:
+                logger.warning(
+                    f"[BYPASS] 点击失败, 尝试 {attempt + 1}/{max_retries}: {e}"
+                )
+                await asyncio.sleep(0.05 * (attempt + 1))
 
-    raise RuntimeError(f"[BYPASS] 点击失败: 尝试 {max_retries} 次均未成功")
+        raise RuntimeError(f"[BYPASS] 点击失败: 尝试 {max_retries} 次均未成功")
 
     async def insert_text(self, text: str):
         """
