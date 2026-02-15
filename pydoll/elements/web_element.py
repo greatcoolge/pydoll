@@ -649,35 +649,53 @@ class WebElement(FindElementsMixin):  # noqa: PLR0904
             try {
                 const elem = this;
                 const rect = elem.getBoundingClientRect();
-
+            
+                console.log("[DEBUG] 元素在iframe内坐标:", rect.left, rect.top);
+            
                 let x = rect.left;
                 let y = rect.top;
                 let width = rect.width;
                 let height = rect.height;
-
+            
                 let win = window;
+                let level = 0;
 
                 // 累加父 iframe 偏移（跨域安全）
                 try {
                     while (win !== win.top) {
+                        level++;
                         const iframe = win.frameElement;
-                        if (!iframe) break;
-
+                        if (!iframe) {
+                            console.log("[DEBUG] 第", level, "层: iframe 不存在");
+                            win = win.parent;
+                            continue;
+                        }
+                    
+                        console.log("[DEBUG] 第", level, "层: iframe 标签", iframe.tagName);
+                    
                         const iframeRect = iframe.getBoundingClientRect();
+                        console.log("[DEBUG] 第", level, "层: iframe 位置", iframeRect.left, iframeRect.top);
+                    
                         x += iframeRect.left;
                         y += iframeRect.top;
-
+                    
+                        console.log("[DEBUG] 累加后 x,y:", x, y);
+                    
                         win = win.parent;
                     }
+                    console.log("[DEBUG] 总共累加", level, "层 iframe");
                 } catch (e) {
-                    // 跨域访问 parent 会抛异常，这里忽略
+                    console.log("[DEBUG] 累加 iframe 时出错:", e.message);
                 }
 
                 // 顶层滚动偏移
+                console.log("[DEBUG] 滚动前 x,y:", x, y);
                 x += window.scrollX || 0;
                 y += window.scrollY || 0;
+                console.log("[DEBUG] 滚动后 x,y:", x, y);
 
                 const dpr = window.devicePixelRatio || 1;
+                console.log("[DEBUG] DPR:", dpr);
 
                 return {
                     success: true,
@@ -687,6 +705,7 @@ class WebElement(FindElementsMixin):  # noqa: PLR0904
                     height: Math.round(height * dpr)
                 };
             } catch (err) {
+                console.log("[DEBUG] 整体错误:", err.message);
                 return {
                     success: false,
                     error: err.message
@@ -705,6 +724,18 @@ class WebElement(FindElementsMixin):  # noqa: PLR0904
 
         if not value.get("success"):
             raise RuntimeError(f"[BYPASS] JS 执行失败: {value.get('error')}")
+
+        # 执行 get_global_bounds 后获取控制台日志
+        try:
+            logs = await self.page.get_console_logs()
+            for log in logs:
+                if '[DEBUG]' in log:
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.info(f"[CONSOLE] {log}")
+        except Exception as e:
+            # 如果获取日志失败，不影响主流程
+            pass
 
         return {
             "x": value["x"],
