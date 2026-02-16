@@ -1960,23 +1960,85 @@ class Tab(FindElementsMixin):
         event: dict,
         time_to_wait_captcha: float = 5,
     ) -> None:
-        """Attempt to bypass Cloudflare Turnstile captcha via shadow root traversal.
-
-        Traverses shadow roots to locate the Cloudflare iframe, navigates into
-        it, and clicks the actual checkbox element (``span.cb-i``).
-        """
+        """Attempt to bypass Cloudflare Turnstile captcha via shadow root traversal."""
         try:
             timeout_int = int(time_to_wait_captcha)
+
+            # 1️⃣ 找 shadow root
             shadow_root = await self._find_cloudflare_shadow_root(
                 timeout=time_to_wait_captcha,
             )
-            iframe = await shadow_root.query(_CLOUDFLARE_IFRAME_SELECTOR, timeout=timeout_int)
-            body = await iframe.find(tag_name='body', timeout=timeout_int)
-            inner_shadow = await body.get_shadow_root(timeout=time_to_wait_captcha)
-            checkbox = await inner_shadow.query(_CLOUDFLARE_CHECKBOX_SELECTOR, timeout=timeout_int)
+            if not shadow_root:
+                logger.warning("[BYPASS] shadow root not found")
+                return
+
+            # 2️⃣ 找 iframe
+            iframe = await shadow_root.query(
+                _CLOUDFLARE_IFRAME_SELECTOR,
+                timeout=timeout_int
+            )
+            if not iframe:
+                logger.warning("[BYPASS] iframe not found")
+                return
+
+            # 3️⃣ 找 body
+            body = await iframe.find(tag_name="body", timeout=timeout_int)
+            if not body:
+                logger.warning("[BYPASS] body not found")
+                return
+
+            # 4️⃣ 获取 inner shadow（带重试）
+            try:
+                inner_shadow = await body.get_shadow_root(
+                    timeout=time_to_wait_captcha
+                )
+            except WaitElementTimeout:
+                logger.warning("[BYPASS] inner shadow timeout, retrying...")
+                inner_shadow = await body.get_shadow_root(
+                    timeout=time_to_wait_captcha * 2
+                )
+
+            if not inner_shadow:
+                logger.warning("[BYPASS] inner shadow not found")
+                return
+
+            # 5️⃣ 找 checkbox
+            checkbox = await inner_shadow.query(
+                _CLOUDFLARE_CHECKBOX_SELECTOR,
+                timeout=timeout_int
+            )
+            if not checkbox:
+                logger.warning("[BYPASS] checkbox not found")
+                return
+
+            # 改成这样
+            tag_name = checkbox.tag_name  # 不加 await
+            if tag_name is None:
+                tag_name = 'unknown'
+
+            type_attr = checkbox.get_attribute('type')  # 不加 await
+            if type_attr is None:
+                type_attr = 'unknown'
+
+            logger.info(f"[BYPASS] 找到元素: tag={tag_name}, type={type_attr}")
+
+            # 6️⃣ 稍微等一下，让 DOM 稳定（不要太久）
+            await asyncio.sleep(random.uniform(1.2, 2.3))
+
+            # 7️⃣ 滚动到可视区域（很关键）
+            await checkbox.scroll_into_view()
+            await asyncio.sleep(random.uniform(0.3, 0.6))
+
+            # 8️⃣ 点击
             await checkbox.click()
+
+            # 9️⃣ 等待验证生效
+            await asyncio.sleep(5)
+
+            logger.info("[BYPASS] ✅ checkbox clicked")
+
         except Exception as exc:
-            logger.error(f'Error in cloudflare bypass: {exc}')
+            logger.error(f"Error in cloudflare bypass: {exc}")
 
 
 class _DownloadHandle:
