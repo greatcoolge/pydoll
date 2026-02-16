@@ -776,7 +776,7 @@ async def test_grant_permissions(mock_browser):
         BrowserCommands.grant_permissions(
             permissions=permissions, origin='https://example.com', browser_context_id=None
         ),
-        timeout=10,
+        timeout=30,
     )
 
 
@@ -980,7 +980,7 @@ async def test_continue_request_with_all_params(mock_browser):
             headers=headers,
             intercept_response=intercept_response,
         ),
-        timeout=10,
+        timeout=30,
     )
 
 
@@ -1012,7 +1012,7 @@ async def test_fulfill_request(mock_browser):
             body=None,
             response_phrase=None,
         ),
-        timeout=10,
+        timeout=30,
     )
 
 
@@ -1042,7 +1042,7 @@ async def test_fulfill_request_with_all_params(mock_browser):
             body=body,
             response_phrase=response_phrase,
         ),
-        timeout=10,
+        timeout=30,
     )
 
 
