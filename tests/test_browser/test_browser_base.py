@@ -488,7 +488,7 @@ async def test__continue_request_auth_required_callback(mock_browser):
 
     mock_browser._connection_handler.execute_command.assert_any_call(
         FetchCommands.continue_request_with_auth('request1', 'ProvideCredentials', 'user', 'pass'),
-        timeout=10,
+        timeout=30,
     )
 
     mock_browser._connection_handler.execute_command.assert_any_call(FetchCommands.disable())
