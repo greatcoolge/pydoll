@@ -424,7 +424,7 @@ async def test_get_window_id(mock_browser):
     window_id = await mock_browser.get_window_id()
     assert window_id == 'window1'
     mock_browser._connection_handler.execute_command.assert_called_with(
-        BrowserCommands.get_window_for_target('target1'), timeout=10
+        BrowserCommands.get_window_for_target('target1'), timeout=30
     )
 
 
