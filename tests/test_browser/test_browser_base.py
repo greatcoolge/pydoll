@@ -289,7 +289,7 @@ async def test_cookie_management(mock_browser):
 
     await mock_browser.delete_all_cookies()
     mock_browser._connection_handler.execute_command.assert_any_await(
-        StorageCommands.clear_cookies(), timeout=10
+        StorageCommands.clear_cookies(), timeout=30
     )
 
 
