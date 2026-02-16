@@ -273,7 +273,7 @@ async def test_cookie_management(mock_browser):
     cookies = [{'name': 'test', 'value': '123'}]
     await mock_browser.set_cookies(cookies)
     mock_browser._connection_handler.execute_command.assert_any_call(
-        StorageCommands.set_cookies(cookies=cookies, browser_context_id=None), timeout=10
+        StorageCommands.set_cookies(cookies=cookies, browser_context_id=None), timeout=30
     )
 
     mock_browser._connection_handler.execute_command.return_value = {'result': {'cookies': cookies}}
