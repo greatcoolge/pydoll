@@ -432,7 +432,7 @@ async def test_get_window_id(mock_browser):
 async def test_stop_browser(mock_browser):
     await mock_browser.stop()
     mock_browser._connection_handler.execute_command.assert_any_await(
-        BrowserCommands.close(), timeout=10
+        BrowserCommands.close(), timeout=30
     )
     mock_browser._browser_process_manager.stop_process.assert_called_once()
     mock_browser._temp_directory_manager.cleanup.assert_called_once()
@@ -474,7 +474,7 @@ async def test_disable_events(mock_browser):
 async def test__continue_request_callback(mock_browser):
     await mock_browser._continue_request_callback({'params': {'requestId': 'request1'}})
     mock_browser._connection_handler.execute_command.assert_called_with(
-        FetchCommands.continue_request('request1'), timeout=10
+        FetchCommands.continue_request('request1'), timeout=30
     )
 
 
