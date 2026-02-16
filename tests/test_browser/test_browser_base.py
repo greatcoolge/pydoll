@@ -341,12 +341,12 @@ async def test_window_management(mock_browser):
 
     await mock_browser.set_window_maximized()
     mock_browser._connection_handler.execute_command.assert_any_await(
-        BrowserCommands.set_window_maximized('window1'), timeout=10
+        BrowserCommands.set_window_maximized('window1'), timeout=30
     )
 
     await mock_browser.set_window_minimized()
     mock_browser._connection_handler.execute_command.assert_any_await(
-        BrowserCommands.set_window_minimized('window1'), timeout=10
+        BrowserCommands.set_window_minimized('window1'), timeout=30
     )
 
 
