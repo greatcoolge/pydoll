@@ -336,7 +336,7 @@ async def test_window_management(mock_browser):
     bounds = {'width': 800, 'height': 600}
     await mock_browser.set_window_bounds(bounds)
     mock_browser._connection_handler.execute_command.assert_any_await(
-        BrowserCommands.set_window_bounds('window1', bounds), timeout=10
+        BrowserCommands.set_window_bounds('window1', bounds), timeout=30
     )
 
     await mock_browser.set_window_maximized()
