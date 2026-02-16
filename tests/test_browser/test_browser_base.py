@@ -79,7 +79,7 @@ async def mock_browser():
         yield browser
 
 @pytest_asyncio.fixture
-async def mock_browser():
+async def mock_browser_minimal():
     with (
         patch.multiple(
             Browser,
