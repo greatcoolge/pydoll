@@ -975,7 +975,7 @@ async def test_fail_request(mock_browser):
     await mock_browser.fail_request(request_id, error_reason)
 
     mock_browser._connection_handler.execute_command.assert_called_with(
-        FetchCommands.fail_request(request_id, error_reason), timeout=10
+        FetchCommands.fail_request(request_id, error_reason), timeout=30
     )
 
 
