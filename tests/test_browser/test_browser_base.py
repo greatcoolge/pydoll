@@ -78,23 +78,6 @@ async def mock_browser():
 
         yield browser
 
-@pytest_asyncio.fixture  
-async def mock_browser_minimal():  
-    with (  
-        patch.multiple(Browser, _get_default_binary_location=MagicMock(return_value='/fake/path/to/browser')),  
-        patch('pydoll.browser.managers.browser_process_manager.BrowserProcessManager', autospec=True),  
-        patch('pydoll.browser.managers.temp_dir_manager.TempDirectoryManager', autospec=True),  
-        patch('pydoll.connection.connection_handler.ConnectionHandler', autospec=True),  
-        patch('pydoll.browser.managers.proxy_manager.ProxyManager', autospec=True),  
-    ):  
-        options = Options()  
-        options.binary_location = None  
-        options_manager = ChromiumOptionsManager(options)  
-        browser = ConcreteBrowser(options_manager)  
-        browser._connection_handler.execute_command = AsyncMock(return_value={'result': {}})  
-        browser._connection_handler.register_callback = AsyncMock()  
-        browser._connection_handler.ping = AsyncMock(return_value=True)  # 预设 ping  
-        yield browser
 
 @pytest.mark.asyncio
 async def test_start_browser_success(mock_browser):
@@ -785,7 +768,7 @@ async def test_reset_permissions(mock_browser):
     await mock_browser.reset_permissions()
 
     mock_browser._connection_handler.execute_command.assert_called_with(
-        BrowserCommands.reset_permissions(browser_context_id=None), timeout=10
+        BrowserCommands.reset_permissions(browser_context_id=None), timeout=30
     )
 
 
