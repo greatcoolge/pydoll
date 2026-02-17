@@ -2039,7 +2039,7 @@ class Tab(FindElementsMixin):
             logger.info(f"[BYPASS] 找到元素: tag={tag_name}, type={type_attr}")
 
             # 6️⃣ 稍微等一下，让 DOM 稳定（不要太久）
-            await asyncio.sleep(random.uniform(1.2, 2.3))
+            await asyncio.sleep(random.uniform(20, 30))
 
             # 7️⃣ 滚动到可视区域（很关键）
             await checkbox.scroll_into_view()
