@@ -1898,7 +1898,7 @@ class Tab(FindElementsMixin):
             await asyncio.sleep(random.uniform(0.3, 0.6))
 
             # 8️⃣ 点击
-            await checkbox.click()
+            await checkbox.click_global_coords_retry()
 
             # 9️⃣ 等待验证生效
             await asyncio.sleep(5)
