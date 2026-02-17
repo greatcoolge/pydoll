@@ -806,7 +806,7 @@ async def test_get_version(mock_browser):
     assert version['product'] == 'Chrome/90.0.4430.93'
 
     mock_browser._connection_handler.execute_command.assert_called_with(
-        BrowserCommands.get_version(), timeout=10
+        BrowserCommands.get_version(), timeout=30
     )
 
 
@@ -948,7 +948,7 @@ async def test_continue_request(mock_browser):
             headers=None,
             intercept_response=None,
         ),
-        timeout=10,
+        timeout=30,
     )
 
 
