@@ -749,7 +749,7 @@ async def test_set_download_behavior(mock_browser):
             browser_context_id=None,
             events_enabled=True,
         ),
-        timeout=10,
+        timeout=30,
     )
 
 
