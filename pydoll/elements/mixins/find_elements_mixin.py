@@ -729,7 +729,7 @@ class FindElementsMixin:
     async def _execute_command(
         self, command: Command[T_CommandParams, T_CommandResponse]
     ) -> T_CommandResponse:
-        """Execute CDP command via resolved handler (10s timeout)."""
+        """Execute CDP command via resolved handler (30s timeout)."""
         handler, session_id = self._resolve_routing()
         if session_id:
             command['sessionId'] = session_id
