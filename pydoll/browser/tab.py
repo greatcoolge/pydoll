@@ -2009,7 +2009,7 @@ class Tab(FindElementsMixin):
     ) -> None:
         """
         独立函数：带重试、滚动与随机等待的 Cloudflare Turnstile 绕过。
-    
+
         Args:
             tab: Tab 实例
             time_to_wait_captcha: 查找验证码的超时时间（默认 5 秒）
@@ -2054,7 +2054,11 @@ class Tab(FindElementsMixin):
 
             # 6️⃣ 记录元素信息
             tag_name = checkbox.tag_name if checkbox.tag_name else 'unknown'
-            type_attr = checkbox.get_attribute('type') if checkbox.get_attribute('type') else 'unknown'
+            type_attr = (
+                checkbox.get_attribute("type")
+                if checkbox.get_attribute("type")
+                else "unknown"
+            )
             logger.info(f"[BYPASS] 找到元素: tag={tag_name}, type={type_attr}")
 
             # 7️⃣ 随机等待（模拟人类）
@@ -2074,6 +2078,7 @@ class Tab(FindElementsMixin):
 
         except Exception as exc:
             logger.error(f"Error in cloudflare bypass: {exc}")
+
 
 class _DownloadHandle:
     """Handle returned by expect_download to access the downloaded file."""
