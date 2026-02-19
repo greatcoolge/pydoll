@@ -2054,6 +2054,13 @@ class Tab(FindElementsMixin):
             # 9️⃣ 等待验证生效
             await asyncio.sleep(5)
 
+            # 10️⃣ 读取 token
+            value = await self.execute_script("""
+            return document.querySelector('input[id$="_response"]')?.value
+            """)
+
+            logger.info(f"[BYPASS] CF TOKEN = {value}")
+
             logger.info("[BYPASS] ✅ checkbox clicked")
 
         except Exception as exc:
