@@ -1587,7 +1587,7 @@ class Tab(FindElementsMixin):
             time_to_wait_captcha: 验证码检测超时（默认 5 秒）。
         """
         captcha_processed = asyncio.Event()
-    
+
         async def bypass_cloudflare():
             try:
                 await self._bypass_cloudflare(
@@ -1596,14 +1596,14 @@ class Tab(FindElementsMixin):
                 )
             finally:
                 captcha_processed.set()
-    
+
         _before_page_events_enabled = self.page_events_enabled
-    
+
         if not _before_page_events_enabled:
             await self.enable_page_events()
-    
+
         logger.info('Expecting and bypassing Cloudflare captcha if present (no navigation)')
-    
+
         try:
             yield
             # 直接调用绕过，而不是等待 LOAD_EVENT_FIRED
@@ -1612,7 +1612,7 @@ class Tab(FindElementsMixin):
         finally:
             if not _before_page_events_enabled:
                 await self.disable_page_events()
-   
+
     @asynccontextmanager
     async def expect_download(
         self,
