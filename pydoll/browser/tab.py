@@ -2038,6 +2038,9 @@ class Tab(FindElementsMixin):
 
             logger.info(f"[BYPASS] 找到元素: tag={tag_name}, type={type_attr}")
 
+            # 🔍 检查是否被识别为自动化
+            webdriver_flag = await self.execute_script("return navigator.webdriver")
+            logger.info(f"[BYPASS] navigator.webdriver = {webdriver_flag}")
             # 6️⃣ 稍微等一下，让 DOM 稳定（不要太久）
             await asyncio.sleep(random.uniform(20, 30))
 
