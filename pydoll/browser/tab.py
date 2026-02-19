@@ -2003,6 +2003,77 @@ class Tab(FindElementsMixin):
         except Exception as exc:
             logger.error(f'Error in cloudflare bypass: {exc}')
 
+    async def _bypass_cloudflare_robust(
+        tab: Tab,
+        time_to_wait_captcha: float = 5,
+    ) -> None:
+        """
+        独立函数：带重试、滚动与随机等待的 Cloudflare Turnstile 绕过。
+    
+        Args:
+            tab: Tab 实例
+            time_to_wait_captcha: 查找验证码的超时时间（默认 5 秒）
+        """
+        try:
+            timeout_int = int(time_to_wait_captcha)
+
+            # 1️⃣ 找 shadow root（复用 tab 的方法）
+            shadow_root = await tab._find_cloudflare_shadow_root(timeout=time_to_wait_captcha)
+            if not shadow_root:
+                logger.warning("[BYPASS] shadow root not found")
+                return
+
+            # 2️⃣ 找 iframe
+            iframe = await shadow_root.query(_CLOUDFLARE_IFRAME_SELECTOR, timeout=timeout_int)
+            if not iframe:
+                logger.warning("[BYPASS] iframe not found")
+                return
+
+            # 3️⃣ 找 body
+            body = await iframe.find(tag_name="body", timeout=timeout_int)
+            if not body:
+                logger.warning("[BYPASS] body not found")
+                return
+
+            # 4️⃣ 获取 inner shadow（带重试）
+            try:
+                inner_shadow = await body.get_shadow_root(timeout=time_to_wait_captcha)
+            except WaitElementTimeout:
+                logger.warning("[BYPASS] inner shadow timeout, retrying...")
+                inner_shadow = await body.get_shadow_root(timeout=time_to_wait_captcha * 2)
+
+            if not inner_shadow:
+                logger.warning("[BYPASS] inner shadow not found")
+                return
+
+            # 5️⃣ 找 checkbox
+            checkbox = await inner_shadow.query(_CLOUDFLARE_CHECKBOX_SELECTOR, timeout=timeout_int)
+            if not checkbox:
+                logger.warning("[BYPASS] checkbox not found")
+                return
+
+            # 6️⃣ 记录元素信息
+            tag_name = checkbox.tag_name if checkbox.tag_name else 'unknown'
+            type_attr = checkbox.get_attribute('type') if checkbox.get_attribute('type') else 'unknown'
+            logger.info(f"[BYPASS] 找到元素: tag={tag_name}, type={type_attr}")
+
+            # 7️⃣ 随机等待（模拟人类）
+            await asyncio.sleep(random.uniform(20, 30))
+
+            # 8️⃣ 滚动到可视区域
+            await checkbox.scroll_into_view()
+            await asyncio.sleep(random.uniform(0.3, 0.6))
+
+            # 9️⃣ 点击
+            await checkbox.click()
+
+            # 🔟 等待验证生效
+            await asyncio.sleep(5)
+
+            logger.info("[BYPASS] ✅ checkbox clicked")
+
+        except Exception as exc:
+            logger.error(f"Error in cloudflare bypass: {exc}")
 
 class _DownloadHandle:
     """Handle returned by expect_download to access the downloaded file."""
