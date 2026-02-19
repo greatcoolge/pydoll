@@ -1576,6 +1576,44 @@ class Tab(FindElementsMixin):
                 await self.disable_page_events()
 
     @asynccontextmanager
+    async def expect_and_bypass_cloudflare_captcha_no_navigation(
+        self,
+        time_to_wait_captcha: float = 5,
+    ) -> AsyncGenerator[None, None]:
+        """
+        不依赖导航事件的自动 Cloudflare 验证码绕过的上下文管理器。
+
+        Args:
+            time_to_wait_captcha: 验证码检测超时（默认 5 秒）。
+        """
+        captcha_processed = asyncio.Event()
+    
+        async def bypass_cloudflare():
+            try:
+                await self._bypass_cloudflare(
+                    {},  # 不需要事件字典
+                    time_to_wait_captcha=time_to_wait_captcha,
+                )
+            finally:
+                captcha_processed.set()
+    
+        _before_page_events_enabled = self.page_events_enabled
+    
+        if not _before_page_events_enabled:
+            await self.enable_page_events()
+    
+        logger.info('Expecting and bypassing Cloudflare captcha if present (no navigation)')
+    
+        try:
+            yield
+            # 直接调用绕过，而不是等待 LOAD_EVENT_FIRED
+            await bypass_cloudflare()
+            await captcha_processed.wait()
+        finally:
+            if not _before_page_events_enabled:
+                await self.disable_page_events()
+   
+    @asynccontextmanager
     async def expect_download(
         self,
         keep_file_at: Optional[Union[str, Path]] = None,
