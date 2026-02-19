@@ -1591,7 +1591,7 @@ class Tab(FindElementsMixin):
 
         async def bypass_cloudflare():
             try:
-                await self._bypass_cloudflare(
+                await self._bypass_cloudflare_robust(
                     {},  # 不需要事件字典
                     time_to_wait_captcha=time_to_wait_captcha,
                 )
