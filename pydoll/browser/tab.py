@@ -2041,14 +2041,36 @@ class Tab(FindElementsMixin):
             # 🔍 检查是否被识别为自动化
             webdriver_flag = await self.execute_script("return navigator.webdriver")
             logger.info(f"[BYPASS] navigator.webdriver = {webdriver_flag}")
-            # 6️⃣ 稍微等一下，让 DOM 稳定（不要太久）
-            await asyncio.sleep(10)
+            # 让页面自然存在一会
+            await asyncio.sleep(random.uniform(6, 12))
 
-            # 7️⃣ 滚动到可视区域（很关键）
+            # 模拟轻微浏览
+            await self.execute_script(
+                f"window.scrollBy(0, {random.randint(80, 200)});"
+            )
+            await asyncio.sleep(random.uniform(0.5, 1.5))
+
+            await self.execute_script(
+                f"window.scrollBy(0, {-random.randint(50, 150)});"
+            )
+            await asyncio.sleep(random.uniform(0.5, 1.5))
+
+            # 滚动后加入随机鼠标移动（不移动到验证码元素）
+            viewport = await self.execute_script(
+                "return {width: window.innerWidth, height: window.innerHeight}"
+            )
+
+            for _ in range(random.randint(1, 2)):
+                rx = random.randint(50, viewport['width'] - 50)
+                ry = random.randint(80, viewport['height'] - 80)
+
+                await self.mouse.move(rx, ry, humanize=True)
+                await asyncio.sleep(random.uniform(0.2, 0.6))
+
             await checkbox.scroll_into_view()
-            await asyncio.sleep(random.uniform(0.3, 0.6))
+            await asyncio.sleep(random.uniform(0.8, 1.5))
 
-            # 8️⃣ 点击
+            # 最后再点击
             await checkbox.click()
 
             # 9️⃣ 等待验证生效
