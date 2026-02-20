@@ -2005,7 +2005,8 @@ class Tab(FindElementsMixin):
             logger.error(f'Error in cloudflare bypass: {exc}')
 
     async def _bypass_cloudflare_robust(
-        tab: Tab,
+        self,
+        # tab: Tab,
         time_to_wait_captcha: float = 5,
     ) -> None:
         """
@@ -2019,7 +2020,7 @@ class Tab(FindElementsMixin):
             timeout_int = int(time_to_wait_captcha)
 
             # 1️⃣ 找 shadow root（复用 tab 的方法）
-            shadow_root = await tab._find_cloudflare_shadow_root(timeout=time_to_wait_captcha)
+            shadow_root = await self._find_cloudflare_shadow_root(timeout=time_to_wait_captcha)
             if not shadow_root:
                 logger.warning("[BYPASS] shadow root not found")
                 return
