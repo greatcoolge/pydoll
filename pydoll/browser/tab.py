@@ -2056,13 +2056,12 @@ class Tab(FindElementsMixin):
             await asyncio.sleep(random.uniform(0.5, 1.5))
 
             # 滚动后加入随机鼠标移动（不移动到验证码元素）
-            viewport = await self.execute_script(
-                "return {width: window.innerWidth, height: window.innerHeight}"
-            )
+            center = await self.scroll._get_viewport_center()  
+            cx, cy = center
 
             for _ in range(random.randint(1, 2)):
-                rx = random.randint(50, viewport['width'] - 50)
-                ry = random.randint(80, viewport['height'] - 80)
+                rx = cx + random.randint(-150, 150)
+                ry = cy + random.randint(-100, 100)
 
                 await self.mouse.move(rx, ry, humanize=True)
                 await asyncio.sleep(random.uniform(0.2, 0.6))
@@ -2072,18 +2071,22 @@ class Tab(FindElementsMixin):
 
             # 最后再点击
             await checkbox.click()
-
-            # 9️⃣ 等待验证生效
-            await asyncio.sleep(5)
-
-            # 10️⃣ 读取 token
-            value = await self.execute_script("""
-            return document.querySelector('input[id$="_response"]')?.value
-            """)
-
-            logger.info(f"[BYPASS] CF TOKEN = {value}")
-
             logger.info("[BYPASS] ✅ checkbox clicked")
+
+            # 🔟 等待验证生效
+            await asyncio.sleep(random.uniform(2.0, 4.0))
+
+            # 11️⃣ 轮询 token（观察即可，不作为判断）
+            for _ in range(5):
+                value = await self.execute_script("""
+                    return document.querySelector('input[id$="_response"]')?.value
+                """)
+                if value:
+                    logger.info(f"[BYPASS] 🎉 CF TOKEN = {value}")
+                    break
+                await asyncio.sleep(1)
+
+            logger.info("[BYPASS] finished")
 
         except Exception as exc:
             logger.error(f"Error in cloudflare bypass: {exc}")
