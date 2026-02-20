@@ -2028,15 +2028,15 @@ class Tab(FindElementsMixin):
                 return
 
             # 改成这样
-            tag_name = checkbox.tag_name  # 不加 await
-            if tag_name is None:
-                tag_name = 'unknown'
+            # tag_name = checkbox.tag_name  # 不加 await
+            # if tag_name is None:
+                # tag_name = 'unknown'
 
-            type_attr = checkbox.get_attribute('type')  # 不加 await
-            if type_attr is None:
-                type_attr = 'unknown'
+            # type_attr = checkbox.get_attribute('type')  # 不加 await
+            # if type_attr is None:
+                # type_attr = 'unknown'
 
-            logger.info(f"[BYPASS] 找到元素: tag={tag_name}, type={type_attr}")
+            # logger.info(f"[BYPASS] 找到元素: tag={tag_name}, type={type_attr}")
 
             # 🔍 检查是否被识别为自动化
             # webdriver_flag = await self.execute_script("return navigator.webdriver")
