@@ -2042,7 +2042,7 @@ class Tab(FindElementsMixin):
             webdriver_flag = await self.execute_script("return navigator.webdriver")
             logger.info(f"[BYPASS] navigator.webdriver = {webdriver_flag}")
             # 6️⃣ 稍微等一下，让 DOM 稳定（不要太久）
-            await asyncio.sleep(random.uniform(20, 30))
+            await asyncio.sleep(10)
 
             # 7️⃣ 滚动到可视区域（很关键）
             await checkbox.scroll_into_view()
