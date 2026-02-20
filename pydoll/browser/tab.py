@@ -2063,7 +2063,7 @@ class Tab(FindElementsMixin):
             logger.info(f"[BYPASS] 找到元素: tag={tag_name}, type={type_attr}")
 
             # 7️⃣ 随机等待（模拟人类）
-            await asyncio.sleep(random.uniform(20, 30))
+            await asyncio.sleep(random.uniform(10, 15))
 
             # 8️⃣ 滚动到可视区域
             await checkbox.scroll_into_view()
