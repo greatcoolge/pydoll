@@ -2063,22 +2063,51 @@ class Tab(FindElementsMixin):
             logger.info(f"[BYPASS] 找到元素: tag={tag_name}, type={type_attr}")
 
             # 7️⃣ 随机等待（模拟人类）
-            await asyncio.sleep(random.uniform(10, 15))
+            await asyncio.sleep(random.uniform(6, 12))
 
-            # 8️⃣ 滚动到可视区域
+            # 模拟轻微浏览
+            await self.execute_script(
+                f"window.scrollBy(0, {random.randint(80, 200)});"
+            )
+            await asyncio.sleep(random.uniform(0.5, 1.5))
+
+            await self.execute_script(
+                f"window.scrollBy(0, {-random.randint(50, 150)});"
+            )
+            await asyncio.sleep(random.uniform(0.5, 1.5))
+
+            # 滚动后加入随机鼠标移动（不移动到验证码元素
+            center = await self.scroll._get_viewport_center()
+            cx, cy = center
+
+            for _ in range(random.randint(1, 2)):
+                rx = cx + random.randint(-150, 150)
+                ry = cy + random.randint(-100, 100)
+
+                await self.mouse.move(rx, ry, humanize=True)
+                await asyncio.sleep(random.uniform(0.2, 0.6))
+
             await checkbox.scroll_into_view()
-            await asyncio.sleep(random.uniform(0.3, 0.6))
+            await asyncio.sleep(random.uniform(0.8, 1.5))
 
-            # 9️⃣ 点击
+            # 最后再点击
             await checkbox.click()
-
-            # 🔟 等待验证生效
-            await asyncio.sleep(5)
-
             logger.info("[BYPASS] ✅ checkbox clicked")
 
-        except Exception as exc:
-            logger.error(f"Error in cloudflare bypass: {exc}")
+            # 等待验证生效
+            await asyncio.sleep(random.uniform(2.0, 4.0))
+
+            # 轮询 token（观察即可，不作为判断
+            for _ in range(5):
+                value = await self.execute_script("""
+                    return document.querySelector('input[id$="_response"]')?.value
+                """)
+                if value:
+                    logger.info(f"[BYPASS] 🎉 CF TOKEN = {value}")
+                    break
+                await asyncio.sleep(1)
+
+            logger.info("[BYPASS] finished")
 
 
 class _DownloadHandle:
