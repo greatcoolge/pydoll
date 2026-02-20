@@ -2056,7 +2056,7 @@ class Tab(FindElementsMixin):
             await asyncio.sleep(random.uniform(0.5, 1.5))
 
             # 滚动后加入随机鼠标移动（不移动到验证码元素）
-            center = await self.scroll._get_viewport_center()  
+            center = await self.scroll._get_viewport_center()
             cx, cy = center
 
             for _ in range(random.randint(1, 2)):
