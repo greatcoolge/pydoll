@@ -2109,6 +2109,9 @@ class Tab(FindElementsMixin):
 
             logger.info("[BYPASS] finished")
 
+        except Exception as exc:
+            logger.error(f"Error in cloudflare bypass: {exc}")
+
 
 class _DownloadHandle:
     """Handle returned by expect_download to access the downloaded file."""
