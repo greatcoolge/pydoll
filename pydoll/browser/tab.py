@@ -52,6 +52,7 @@ from pydoll.exceptions import (
     InvalidScriptWithElement,
     InvalidTabInitialization,
     MissingScreenshotPath,
+    NavigationError,
     NetworkEventsNotEnabled,
     NoDialogPresent,
     NotAnIFrame,
@@ -113,6 +114,7 @@ if TYPE_CHECKING:
         CaptureScreenshotResponse,
         GetResourceContentResponse,
         GetResourceTreeResponse,
+        NavigateResponse,
         PrintToPDFResponse,
     )
     from pydoll.protocol.runtime.methods import CallFunctionOnResponse, EvaluateResponse
@@ -893,22 +895,20 @@ class Tab(FindElementsMixin):
         """
         Navigate to URL and wait for loading to complete.
 
-        Refreshes if URL matches current page.
-
         Args:
             url: Target URL to navigate to.
             timeout: Maximum seconds to wait for page load (default 300).
 
         Raises:
+            NavigationError: If the navigation fails (e.g., DNS error).
             PageLoadTimeout: If page doesn't finish loading within timeout.
         """
         logger.info(f'Navigating to URL: {url} (timeout={timeout}s)')
-        if await self._refresh_if_url_not_changed(url):
-            logger.debug('URL matches current page; refreshing instead')
-            return
-
         async with self._wait_page_load(timeout=timeout):
-            await self._execute_command(PageCommands.navigate(url))
+            response: NavigateResponse = await self._execute_command(PageCommands.navigate(url))
+            error_text = response['result'].get('errorText')
+            if error_text:
+                raise NavigationError(url, error_text)
         logger.info(f'Navigation complete: {url}')
 
     async def refresh(
@@ -1858,14 +1858,6 @@ class Tab(FindElementsMixin):
             unique_context_id=unique_context_id,
             serialization_options=serialization_options,
         )
-
-    async def _refresh_if_url_not_changed(self, url: str) -> bool:
-        """Refresh page if URL hasn't changed."""
-        current_url = await self.current_url
-        if current_url == url:
-            await self.refresh()
-            return True
-        return False
 
     @staticmethod
     def _validate_argument_error(response: EvaluateResponse) -> None:
