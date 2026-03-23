@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pydoll-python"
-version = "2.21.3"
+version = "2.22.0"
 description = "Pydoll is a library for automating chromium-based browsers without a WebDriver, offering realistic interactions."
 authors = ["Thalison Fernandes <thalissfernandes99@gmail.com>"]
 readme = "README.md"
@@ -15,6 +15,7 @@ websockets = "^14"
 aiohttp = "^3.9.5"
 aiofiles = "^25.1.0"
 typing_extensions = "^4.14.0"
+pydantic = "^2.0"
 
 
 [tool.poetry.group.dev.dependencies]
