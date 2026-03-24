@@ -2107,11 +2107,7 @@ class Tab(FindElementsMixin):
 
             # 6️⃣ 记录元素信息
             tag_name = checkbox.tag_name if checkbox.tag_name else 'unknown'
-            type_attr = (
-                checkbox.get_attribute("type")
-                if checkbox.get_attribute("type")
-                else "unknown"
-            )
+            type_attr = await checkbox.get_attribute("type") or "unknown"
             logger.info(f"[BYPASS] 找到元素: tag={tag_name}, type={type_attr}")
 
             # 7️⃣ 随机等待（模拟人类）
@@ -2151,9 +2147,10 @@ class Tab(FindElementsMixin):
 
             # 轮询 token（观察即可，不作为判断
             for _ in range(5):
-                value = await self.execute_script("""
+                result = await self.execute_script("""
                     return document.querySelector('input[id$="_response"]')?.value
                 """)
+                value = result.get('result', {}).get('result', {}).get('value', '')
                 if value:
                     logger.info(f"[BYPASS] 🎉 CF TOKEN = {value}")
                     break
