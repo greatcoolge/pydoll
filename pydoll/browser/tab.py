@@ -2146,17 +2146,6 @@ class Tab(FindElementsMixin):
             # 等待验证生效
             await asyncio.sleep(random.uniform(2.0, 4.0))
 
-            # 轮询 token（观察即可，不作为判断
-            for _ in range(5):
-                result = await self.execute_script("""
-                    return document.querySelector('input[id$="_response"]')?.value
-                """)
-                value = result.get('result', {}).get('result', {}).get('value', '')
-                if value:
-                    logger.info(f"[BYPASS] 🎉 CF TOKEN = {value}")
-                    break
-                await asyncio.sleep(1)
-
             logger.info("[BYPASS] finished")
 
         except Exception as exc:
