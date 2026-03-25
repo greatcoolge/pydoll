@@ -2138,6 +2138,7 @@ class Tab(FindElementsMixin):
             await checkbox.scroll_into_view()
             await asyncio.sleep(random.uniform(0.8, 1.5))
 
+            logger.info(f"[BYPASS] checkbox._mouse = {checkbox._mouse}")
             # 最后再点击
             await checkbox.click()
             logger.info("[BYPASS] ✅ checkbox clicked")
