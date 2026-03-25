@@ -38,6 +38,7 @@ class ShadowRoot(FindElementsMixin):
         connection_handler: ConnectionHandler,
         mode: ShadowRootType = ShadowRootType.OPEN,
         host_element: WebElement | None = None,
+        mouse=None,
     ):
         """
         Initialize shadow root wrapper.
@@ -52,6 +53,7 @@ class ShadowRoot(FindElementsMixin):
         self._connection_handler = connection_handler
         self._mode = mode
         self._host_element = host_element
+        self._mouse = mouse  # ← 加这行
 
         # Inherit iframe/routing context from host element if present
         if host_element:
