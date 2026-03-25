@@ -341,7 +341,7 @@ class WebElement(FindElementsMixin):  # noqa: PLR0904
             connection_handler=self._connection_handler,
             mode=mode,
             host_element=self,
-            mouse=getattr(self, '_mouse',
+            mouse=getattr(self, '_mouse', None),
         )
 
     async def get_children_elements(
