@@ -2140,7 +2140,7 @@ class Tab(FindElementsMixin):
 
             logger.info(f"[BYPASS] checkbox._mouse = {checkbox._mouse}")
             # 最后再点击
-            await checkbox.click()
+            await checkbox.click(humanize=True)
             logger.info("[BYPASS] ✅ checkbox clicked")
 
             # 等待验证生效
