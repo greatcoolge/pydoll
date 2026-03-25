@@ -2142,6 +2142,7 @@ class Tab(FindElementsMixin):
             # logger.info(f"[BYPASS] checkbox._mouse = {checkbox._mouse}")
             # 最后再点击
             bounds = await checkbox.get_bounds_using_js()
+            logger.info(f"[BYPASS] checkbox bounds: {bounds}")
             await self.mouse.click(
                  bounds['x'] + bounds['width'] / 2,
                  bounds['y'] + bounds['height'] / 2,
