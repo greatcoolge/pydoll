@@ -2139,7 +2139,7 @@ class Tab(FindElementsMixin):
             await checkbox.scroll_into_view()
             await asyncio.sleep(random.uniform(0.8, 1.5))
 
-            logger.info(f"[BYPASS] checkbox._mouse = {checkbox._mouse}")
+            # logger.info(f"[BYPASS] checkbox._mouse = {checkbox._mouse}")
             # 最后再点击
             bounds = await checkbox.get_bounds_using_js()
             cx = bounds['x'] + bounds['width'] / 2
