@@ -672,6 +672,7 @@ class Tab(FindElementsMixin):
                     connection_handler=self._connection_handler,
                     mode=mode,
                     host_element=host_element,
+                    mouse=getattr(self, 'mouse', None),  # ← 加这行
                 )
             )
 
