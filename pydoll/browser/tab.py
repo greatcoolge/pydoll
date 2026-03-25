@@ -2127,11 +2127,11 @@ class Tab(FindElementsMixin):
 
             # 滚动后加入随机鼠标移动（不移动到验证码元素
             center = await self.scroll._get_viewport_center()
-            cx, cy = center
+            center_x, center_y = center  # ← 改名
 
             for _ in range(random.randint(1, 2)):
-                rx = cx + random.randint(-150, 150)
-                ry = cy + random.randint(-100, 100)
+                rx = center_x + random.randint(-150, 150)
+                ry = center_y + random.randint(-100, 100)
 
                 await self.mouse.move(rx, ry, humanize=True)
                 await asyncio.sleep(random.uniform(0.2, 0.6))
