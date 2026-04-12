@@ -236,6 +236,23 @@ class TestRequestMainMethod:
             await request_instance.request('GET', 'https://example.com')
 
     @pytest.mark.asyncio
+    async def test_request_js_fetch_error_raises_http_error(self, request_instance, mock_tab):
+        """Test that JS fetch errors raise HTTPError with actual error message."""
+        mock_tab._execute_command.return_value = {
+            'result': {
+                'result': {
+                    'value': {
+                        'error': 'TypeError: Failed to fetch',
+                        'status': 0
+                    }
+                }
+            }
+        }
+
+        with pytest.raises(HTTPError, match="TypeError: Failed to fetch"):
+            await request_instance.request('GET', 'https://example.com')
+
+    @pytest.mark.asyncio
     async def test_request_always_clears_callbacks(self, request_instance, mock_tab):
         """Test that callbacks are always cleared, even on error."""
         mock_tab._execute_command.side_effect = Exception("Network error")

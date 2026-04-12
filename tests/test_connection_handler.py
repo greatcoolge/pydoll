@@ -1,5 +1,6 @@
 import asyncio
 import json
+from contextlib import suppress
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -215,8 +216,13 @@ async def test__incoming_messages(connection_handler):
     connection_handler._ws_connection.recv = AsyncMock(
         return_value='{"id": 1, "method": "SomeMethod"}'
     )
-    async_generator = connection_handler._incoming_messages()
-    result = await anext(async_generator)
+
+    try:
+        async_generator = connection_handler._incoming_messages()
+        result = await anext(async_generator)
+    finally:
+        await async_generator.aclose()
+
     assert result == '{"id": 1, "method": "SomeMethod"}'
 
 
@@ -332,3 +338,63 @@ def test__repr__(connection_handler):
 def test__str__(connection_handler):
     result = connection_handler.__str__()
     assert result == 'ConnectionHandler(port=9222)'
+
+
+@pytest.mark.asyncio
+async def test_concurrent_send_does_not_raise(connection_handler):
+    connection_handler._ws_connection.send = AsyncMock()
+
+    futures = []
+    for i in range(1, 6):
+        response = json.dumps({'id': i, 'result': f'ok{i}'})
+        future = asyncio.Future()
+        future.set_result(response)
+        futures.append(future)
+
+    side_effects = iter(futures)
+    connection_handler._command_manager.create_command_future = MagicMock(
+        side_effect=lambda cmd: next(side_effects)
+    )
+
+    commands = [{'id': i, 'method': f'Method{i}'} for i in range(1, 6)]
+    results = await asyncio.gather(
+        *(connection_handler.execute_command(cmd) for cmd in commands)
+    )
+
+    assert len(results) == 5
+    assert connection_handler._ws_connection.send.await_count == 5
+
+
+@pytest.mark.asyncio
+async def test_single_receiver_task_created(connection_handler_closed):
+    mock_ws = AsyncMock()
+    mock_ws.state = State.OPEN
+
+    mock_connector = AsyncMock(return_value=mock_ws)
+    connection_handler_closed._ws_connector = mock_connector
+
+    await connection_handler_closed._ensure_active_connection()
+
+    assert connection_handler_closed._receive_task is not None
+    first_task = connection_handler_closed._receive_task
+
+    mock_ws.state = State.OPEN
+    connection_handler_closed._ws_connection = mock_ws
+    await connection_handler_closed._ensure_active_connection()
+
+    assert connection_handler_closed._receive_task is first_task
+    first_task.cancel()
+    with suppress(asyncio.CancelledError):
+        await first_task
+
+
+@pytest.mark.asyncio
+async def test_command_ids_unique_under_concurrent_calls(connection_handler):
+    assigned_ids = []
+    for _ in range(100):
+        cmd = {'method': 'Test'}
+        connection_handler._command_manager.create_command_future(cmd)
+        assigned_ids.append(cmd['id'])
+
+    assert len(assigned_ids) == 100
+    assert len(set(assigned_ids)) == 100

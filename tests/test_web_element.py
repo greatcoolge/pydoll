@@ -4,7 +4,6 @@ from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
-import pytest_asyncio
 
 from pydoll.browser.options import ChromiumOptions as Options
 from pydoll.browser.chromium.chrome import Chrome
@@ -22,8 +21,8 @@ from pydoll.protocol.input.types import KeyModifier
 from pydoll.protocol.runtime.types import CallArgument
 
 
-@pytest_asyncio.fixture
-async def mock_connection_handler():
+@pytest.fixture
+def mock_connection_handler():
     """Mock connection handler for WebElement tests."""
     with patch('pydoll.connection.ConnectionHandler', autospec=True) as mock:
         handler = mock.return_value
@@ -846,9 +845,10 @@ class TestWebElementHumanizedClick:
             'result': {'model': {'content': bounds}}
         }
 
-        await element_with_mouse.click(humanize=True)
+        humanize = True
+        await element_with_mouse.click(humanize=humanize)
 
-        mouse_mock.click.assert_called_once_with(50.0, 50.0)
+        mouse_mock.click.assert_called_once_with(50.0, 50.0, humanize=humanize)
 
     @pytest.mark.asyncio
     async def test_click_humanized_with_offset(self, element_with_mouse, mouse_mock):
@@ -860,9 +860,10 @@ class TestWebElementHumanizedClick:
             'result': {'model': {'content': bounds}}
         }
 
-        await element_with_mouse.click(x_offset=10, y_offset=20, humanize=True)
+        humanize = True
+        await element_with_mouse.click(x_offset=10, y_offset=20, humanize=humanize)
 
-        mouse_mock.click.assert_called_once_with(60.0, 70.0)
+        mouse_mock.click.assert_called_once_with(60.0, 70.0, humanize=humanize)
 
     @pytest.mark.asyncio
     async def test_click_humanize_false_uses_raw_cdp(self, element_with_mouse, mouse_mock):
@@ -2019,7 +2020,6 @@ including:
 """
 
 import pytest
-import pytest_asyncio
 from unittest.mock import AsyncMock, patch
 
 from pydoll.elements.web_element import WebElement
@@ -2028,8 +2028,8 @@ from pydoll.connection import ConnectionHandler
 from pydoll.exceptions import InvalidIFrame
 
 
-@pytest_asyncio.fixture
-async def mock_connection_handler():
+@pytest.fixture
+def mock_connection_handler():
     """Mock connection handler for WebElement tests."""
     with patch('pydoll.connection.ConnectionHandler', autospec=True) as mock:
         handler = mock.return_value

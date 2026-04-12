@@ -1,3 +1,16 @@
+## 2.22.1 (2026-04-10)
+
+### Fix
+
+- **requests**: surface JavaScript fetch errors with descriptive messages
+- **requests**: surface JavaScript fetch errors with descriptive messages
+- **requests**: surface JavaScript fetch errors with descriptive messages
+- **requests**: surface JavaScript fetch errors with descriptive messages
+- **test**: await canceled receiver task to avoid pending-task leaks
+- add humanize to WebElement.click
+- update broken webelement-domain link in element-finding.md
+- update broken deep-dive links in core-concepts.md
+
 ## 2.22.0 (2026-03-23)
 
 ### Feat
